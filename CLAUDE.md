@@ -149,7 +149,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 # Project Instructions
 
-This is a Laravel 13 project (DT Propix, a single-business product for one real-estate developer, agency or property company per installation, with multiple branches: public website, CRM, unit inventory, booking with payment schedules, collections, accounts, HR and payroll, customer portal) built from the specification in `docs/`.
+This is a Laravel 13 project (DT Propix, a product of Datatech BD Ltd — a single-business product for one real-estate developer, agency or property company per installation, with multiple branches: public website, CRM, unit inventory, booking with payment schedules, collections, accounts, HR and payroll, customer portal) built from the specification in `docs/`.
 
 Read these files before writing any code, in this order:
 

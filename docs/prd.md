@@ -6,7 +6,7 @@
 
 ## 1. Vision
 
-**DT Propix** is a cloud platform that lets a real-estate business run everything from one place: its public website, lead management, project and unit inventory, bookings and installments, collections, accounts, HR and payroll, customer service and a customer portal. **Run your entire real-estate business from one platform.**
+**DT Propix**, a product of **Datatech BD Ltd**, is a cloud platform that lets a real-estate business run everything from one place: its public website, lead management, project and unit inventory, bookings and installments, collections, accounts, HR and payroll, customer service and a customer portal. **Run your entire real-estate business from one platform.**
 
 It answers the questions every developer, agency and property company owner asks and cannot answer today:
 

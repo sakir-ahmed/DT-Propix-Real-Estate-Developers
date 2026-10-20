@@ -1,5 +1,6 @@
 # DT Propix
 
+**DT Propix** — real estate management for developers and agencies, a product of **Datatech BD Ltd** (datatechbd.com) — _Software that runs business._
 **Run your entire real-estate business from one platform.**
 Developed by **Datatech BD Ltd**, Dhaka.
 
@@ -149,6 +150,11 @@ Note: the Phase 0 migrations (`plans`, `tenants` with trial/credits columns) sti
 ## Support
 
 Datatech BD Ltd, Dhaka, Bangladesh.
+
+Email: info@datatechbd.com
+Phone: +880 1575-888775
+WhatsApp: +880 1575-888775
+Address: Flat 4-A, Dhumketu Shikder Tower, Holding No. 66, Paschim Monipur, Mirpur, Dhaka-1216, Bangladesh
 
 ## License
 
