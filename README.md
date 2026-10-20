@@ -98,6 +98,19 @@ The service name `app` follows the Docker Compose file created in Phase 0; adjus
 
 The seeder creates the first `owner` and the hidden Datatech `super-admin` from `.env` (never commit real values). For local development the seeder also creates one demo company with branches.
 
+### Docker
+
+The full stack (app, nginx, MySQL, Redis, queue worker, scheduler) runs with Docker Compose:
+
+```sh
+cp docker-compose.override.yml.example docker-compose.override.yml   # local overrides, git-ignored
+docker compose up -d
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate --seed
+```
+
+Then open http://localhost:8080. Services, overrides, logging and common commands: `docs/docker.md`.
+
 ### Background processes
 
 | Process                                                                         | Command                     |
