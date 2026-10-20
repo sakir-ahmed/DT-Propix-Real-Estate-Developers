@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'app_name' => 'DT Propix',
+    'dashboard_title' => 'Dashboard',
+    'dashboard_empty' => 'The workspace is ready. Modules arrive in later phases.',
+    'ui_kit_title' => 'UI kit',
+    'ui_kit_intro' => 'Shared components in light, dark, English, and Bangla.',
+    'confirm' => 'Confirm',
+    'cancel' => 'Cancel',
+    'save' => 'Save',
+    'close' => 'Close',
+    'search' => 'Search',
+    'empty' => 'Nothing to show yet.',
+    'error' => 'Something went wrong.',
+    'retry' => 'Try again',
+    'loading' => 'Loading',
+    'reason' => 'Reason',
+    'pin' => 'Manager PIN',
+    'type_to_confirm' => 'Type :phrase to confirm',
+    'notifications' => 'Notifications',
+    'command_palette' => 'Search commands',
+    'theme_light' => 'Light mode',
+    'theme_dark' => 'Dark mode',
+    'language' => 'Language',
+    'no_permission' => 'You do not have permission to view this page.',
+    'customer' => 'Customer',
+    'unit' => 'Unit',
+    'outstanding' => 'Outstanding',
+    'available' => 'Available',
+    'hold' => 'On hold',
+    'booked' => 'Booked',
+    'sold' => 'Sold',
+    'landowner' => 'Landowner',
+    'blocked' => 'Blocked',
+];

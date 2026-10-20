@@ -1,24 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable()->index();
+            $table->unsignedBigInteger('branch_id')->nullable()->index();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('username');
+            $table->string('email');
+            $table->string('mobile');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('locale', 5)->default('en');
+            $table->boolean('is_super_admin')->default(false);
+            $table->timestamp('last_seen_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
+
+            $table->unique(['tenant_id', 'email']);
+            $table->unique(['tenant_id', 'username']);
+            $table->unique(['tenant_id', 'mobile']);
+            $table->index(['email', 'username', 'mobile']);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -37,9 +48,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('users');

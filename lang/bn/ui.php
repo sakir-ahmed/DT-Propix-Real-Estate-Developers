@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'app_name' => 'ডিটি প্রপিক্স',
+    'dashboard_title' => 'ড্যাশবোর্ড',
+    'dashboard_empty' => 'কর্মক্ষেত্র প্রস্তুত। মডিউল পরের ধাপে আসবে।',
+    'ui_kit_title' => 'ইউআই কিট',
+    'ui_kit_intro' => 'হালকা, গাঢ়, ইংরেজি এবং বাংলায় একই কম্পোনেন্ট।',
+    'confirm' => 'নিশ্চিত',
+    'cancel' => 'বাতিল',
+    'save' => 'সংরক্ষণ',
+    'close' => 'বন্ধ',
+    'search' => 'খুঁজুন',
+    'empty' => 'এখন দেখানোর কিছু নেই।',
+    'error' => 'কিছু একটা ভুল হয়েছে।',
+    'retry' => 'আবার চেষ্টা',
+    'loading' => 'লোড হচ্ছে',
+    'reason' => 'কারণ',
+    'pin' => 'ম্যানেজার পিন',
+    'type_to_confirm' => 'নিশ্চিত করতে :phrase লিখুন',
+    'notifications' => 'বিজ্ঞপ্তি',
+    'command_palette' => 'কমান্ড খুঁজুন',
+    'theme_light' => 'হালকা মোড',
+    'theme_dark' => 'গাঢ় মোড',
+    'language' => 'ভাষা',
+    'no_permission' => 'এই পাতা দেখার অনুমতি নেই।',
+    'customer' => 'গ্রাহক',
+    'unit' => 'ইউনিট',
+    'outstanding' => 'বকেয়া',
+    'available' => 'খালি',
+    'hold' => 'হোল্ড',
+    'booked' => 'বুকড',
+    'sold' => 'বিক্রিত',
+    'landowner' => 'জমির মালিক',
+    'blocked' => 'বন্ধ',
+];
