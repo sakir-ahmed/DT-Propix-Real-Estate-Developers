@@ -11,7 +11,7 @@
 | Topic         | Rule                                                                                                                                                                                                   |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Base path     | `/api/v1/...` in `routes/api.php`                                                                                                                                                                      |
-| Tenant        | Taken from the authenticated token, or from the website host for `/api/v1/public`. **Never accepted from the client body.**                                                                            |
+| Installation  | One deployment is one company. The API never accepts a company id from the client.                                                                                                                    |
 | Auth          | Laravel Sanctum bearer tokens. Token abilities: `staff`, `customer`, `broker`. Public endpoints need no token.                                                                                         |
 | Docs          | OpenAPI generated automatically (Scramble) at `/api-docs`; every endpoint has request and response examples.                                                                                           |
 | Versioning    | No breaking changes inside `v1`: add fields freely, never rename or remove. Clients send `X-App-Version` and `X-Platform`.                                                                             |
@@ -33,7 +33,7 @@
 | ---- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | 401  | `UNAUTHENTICATED`                        | Missing or invalid token                                                                                                 |
 | 403  | `FORBIDDEN`                              | Role lacks permission                                                                                                    |
-| 404  | `NOT_FOUND`                              | Missing, or belongs to another scope, user or tenant                                                                     |
+| 404  | `NOT_FOUND`                              | Missing, or belongs to another scope, user or branch                                                                     |
 | 422  | `VALIDATION_FAILED`                      | Invalid input, `details` has field errors                                                                                |
 | 409  | `DUPLICATE_LEAD_MERGED`                  | Mobile matched an existing lead; an activity was added (returns the lead id for staff, generic success for public forms) |
 | 409  | `UNIT_NOT_AVAILABLE`                     | Unit is on hold, booked, sold, blocked or landowner share (`details` has current status)                                 |
@@ -51,8 +51,6 @@
 | 422  | `REFUND_EXCEEDS_COLLECTED`               | Refund larger than collected minus deductions                                                                            |
 | 409  | `COMMISSION_ALREADY_PAID`                | Editing a paid commission statement                                                                                      |
 | 403  | `PRICE_NOT_ALLOWED` / `COST_NOT_ALLOWED` | Reading prices or costs without permission                                                                               |
-| 403  | `PLAN_LIMIT_REACHED` / `MODULE_DISABLED` | Project, unit, user or module limit                                                                                      |
-| 403  | `TENANT_SUSPENDED` / `TENANT_READ_ONLY`  | Trial ended or account suspended                                                                                         |
 | 402  | `MESSAGE_CREDIT_INSUFFICIENT`            | Not enough SMS or WhatsApp credits                                                                                       |
 | 429  | `TOO_MANY_REQUESTS`                      | Rate limit hit                                                                                                           |
 | 500  | `SERVER_ERROR`                           | Unexpected (details never exposed)                                                                                       |
@@ -65,12 +63,12 @@
 | ------ | ----------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | POST   | `/api/v1/auth/login`                      | Staff `login` (username, email or mobile) + `password`; returns token.                         |
 | POST   | `/api/v1/auth/logout`                     | Revokes the current token                                                                      |
-| GET    | `/api/v1/auth/me`                         | User, role, permissions, branches, plan limits, trial status, feature flags                    |
+| GET    | `/api/v1/auth/me`                         | User, role, permissions, branches, feature flags                                               |
 | POST   | `/api/v1/auth/otp/send` and `/otp/verify` | Customers and brokers; rate limited by IP and mobile; hashed code, 5-minute expiry, 5 attempts |
 
 ---
 
-## 3. Public Website Endpoints (`/api/v1/public`, tenant from host)
+## 3. Public Website Endpoints (`/api/v1/public`)
 
 | Method | Path                                                | Notes                                                                                                            |
 | ------ | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
@@ -247,24 +245,7 @@ Tokens with ability `customer` or `broker`; everything is scoped to the signed-i
 
 ---
 
-## 6. Platform API (`/api/v1/platform`, super-admin only)
-
-| Method       | Path                                      | Notes                                       |
-| ------------ | ----------------------------------------- | ------------------------------------------- |
-| GET/POST/PUT | `/tenants`                                | Create and manage companies                 |
-| PUT          | `/tenants/{tenant}/plan`                  | Plan, limits, module toggles, trial dates   |
-| POST         | `/tenants/{tenant}/suspend` / `/resume`   | Suspension                                  |
-| GET/POST     | `/tenants/{tenant}/subscription-payments` | Subscription ledger                         |
-| POST         | `/tenants/{tenant}/message-credits`       | Add credits (adjustments need a reason)     |
-| POST         | `/tenants/{tenant}/impersonate`           | Short-lived, audited, with a visible banner |
-| POST         | `/tenants/{tenant}/export`                | Full data export job                        |
-| POST         | `/tenants/{tenant}/imports`               | Import monitor: upload, `dry_run`, commit   |
-| GET          | `/tenants/{tenant}/domains`               | Domain and TLS status                       |
-| GET          | `/tenants/{tenant}/usage`                 | Projects, units, users, storage, messages   |
-
----
-
-## 7. Messaging Providers
+## 6. Messaging Providers
 
 - `MessageChannel` implementations: `SmsChannel` (BdBulkSMS), `EmailChannel` (Laravel Mail), `WhatsAppChannel` (WhatsApp Cloud API, pre-approved templates only). All sends are queued with retries. Credits are reserved and deducted in the same transaction that writes the message log; a failed send refunds the reservation. Message logs store template, channel, status and cost, not extra personal data. Sender ID and WhatsApp template approval depend on the provider and local rules; confirm with them.
 - **Mobile banking receipts** (bKash, Nagad) are recorded with the TrxID and flagged `unverified` until the accountant matches them to the merchant statement. Direct payment gateway integration is out of scope for v1.
@@ -272,6 +253,6 @@ Tokens with ability `customer` or `broker`; everything is scoped to the signed-i
 
 ---
 
-## 8. Dashboards and Real-Time
+## 7. Dashboards and Real-Time
 
 There is no real-time server in v1. Dashboards refresh on load and every few minutes; the availability grid refreshes by light polling; approvals reach users through the in-app inbox, optional SMS, and later push notifications.

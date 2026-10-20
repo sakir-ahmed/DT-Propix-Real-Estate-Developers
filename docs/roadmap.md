@@ -1,29 +1,27 @@
 # ROADMAP: DT Propix
 
 > The AI builds **one phase at a time**, runs tests, and stops. Each phase must satisfy the Definition of Done in `architecture.md`.
-> **First sellable release = Phases 0 to 7** (public website, CRM, projects and units, booking with payment schedules, collections, dashboard). Phases 8 to 13 are upgrades for Growth and Pro plans.
+> **First sellable release = Phases 0 to 7** (public website, CRM, projects and units, booking with payment schedules, collections, dashboard). Phases 8 to 13 are later modules.
 
 Mark finished phases with `[x]`.
 
 ---
 
-## Phase 0: Foundation, Tenancy & UI Kit
+## Phase 0: Foundation & UI Kit
 
 - [ ] Docker Compose (nginx, php-fpm with Chromium, mysql, redis, queue, scheduler), `.env.example`
-- [ ] Multi-tenancy: `Tenant`, `ResolveTenant`, `ResolveWebsite`, `BelongsToTenant`, `BelongsToBranch`, tenant-aware jobs, prefixed cache and storage
-- [ ] Architecture test that fails when a tenant-owned model lacks the trait
+- [ ] Branches: `Branch` model with `is_head_office`, `BelongsToBranch`, branch-scoped jobs and cache keys
+- [ ] Architecture test that fails when a model with `branch_id` lacks `BelongsToBranch`
 - [ ] Inertia + Vue 3 + Tailwind v4 tokens (`design.md`), Sonner, dark mode, SSR on public pages only
 - [ ] Localization middleware, `en` / `bn` files, language switcher
 - [ ] Staff auth (username / email / mobile), OTP service, rate limits, idle timeout
-- [ ] Spatie Permission with teams, per-tenant role seeding, platform `super-admin`
-- [ ] Activity log, access log for exports and document views, encrypted backups, tenant export command
-- [ ] Minimal `/platform` console: create tenant in under 5 minutes, plan, limits, trial dates, message credits
-- [ ] `PlanGate` skeleton (limits, modules, trial and suspension rules)
+- [ ] Spatie Permission without teams; roles seeded for the company; hidden Datatech `super-admin` from `.env`
+- [ ] Activity log, access log for exports and document views, encrypted backups, installation export command
 - [ ] **Shared UI kit** from `design.md` section 22 with `AppIcon` and `NoEmojiTest` in CI
 - [ ] OpenAPI docs generator at `/api-docs`
 - [ ] Hidden `/admin/ui-kit` showcase page that renders every component in light, dark, `en` and `bn`
 
-**Acceptance:** `migrate:fresh --seed` works; two seeded tenants cannot see each other's data (tested); each role sees only its menu; the UI-kit page renders.
+**Acceptance:** `migrate:fresh --seed` works; a manager of one branch gets 404 for another branch's data (tested); each role sees only its menu; the UI-kit page renders.
 
 ## Phase 1: Company Setup, Projects & Unit Inventory
 
@@ -39,15 +37,15 @@ Mark finished phases with `[x]`.
 
 ## Phase 2: Public Website, SEO & Media
 
-- [ ] `ResolveWebsite` host mapping, subdomain and custom domain with verification and TLS
+- [ ] The company's own domain with DNS verification and TLS
 - [ ] Pages, menus, sections, banners, blog, careers, testimonials, team, custom pages (bilingual)
 - [ ] Project and property pages with gallery, floor plans, map, and availability summary according to project settings
 - [ ] Media pipeline (WebP, responsive sizes, alt text required), gated brochures
-- [ ] SEO: meta fields, sitemap per tenant, `robots.txt`, redirects, JSON-LD, `hreflang`
-- [ ] Per-tenant cache by language with purge on publish and on unit status or price change
+- [ ] SEO: meta fields, a sitemap, `robots.txt`, redirects, JSON-LD, `hreflang`
+- [ ] Cache per language with purge on publish and on unit status or price change
 - [ ] Branding settings with accent contrast check; privacy and terms pages
 
-**Acceptance:** an unknown host returns 404; one tenant's site never shows another's content (tested); a unit that becomes booked leaves public search within a minute; Lighthouse SEO 95+ and accessibility 90+ on the seeded demo site; LCP under 2.5 seconds on the mobile profile.
+**Acceptance:** unpublished projects and units never appear on the public site (tested); a unit that becomes booked leaves public search within a minute; Lighthouse SEO 95+ and accessibility 90+ on the seeded demo site; LCP under 2.5 seconds on the mobile profile.
 
 ## Phase 3: CRM & Lead Capture
 
@@ -101,7 +99,7 @@ Mark finished phases with `[x]`.
 - [ ] Sales targets and leaderboards
 - [ ] Onboarding checklist and demo data
 
-**Acceptance:** dashboard totals equal report totals and ledger totals exactly (tested); the dashboard loads in under 3 seconds on a seeded tenant with 20,000 leads, 5,000 units and 3 years of data. **Expenses and Profit use the accounts module when it is enabled; before Phase 9 they show the manual expense totals only. This completes the first sellable release.**
+**Acceptance:** dashboard totals equal report totals and ledger totals exactly (tested); the dashboard loads in under 3 seconds on a seeded company with 20,000 leads, 5,000 units and 3 years of data. **Expenses and Profit use the accounts module when it is enabled; before Phase 9 they show the manual expense totals only. This completes the first sellable release.**
 
 ## Phase 8: Customer Portal & Support Tickets
 
@@ -151,15 +149,13 @@ Mark finished phases with `[x]`.
 
 **Acceptance:** payroll for a seeded month matches hand-calculated payslips; an approved month cannot be edited; salary journal balances; payroll data is visible only to permitted roles.
 
-## Phase 13: Subscription, Billing, Polish & Hardening
+## Phase 13: Polish, API & Hardening
 
-- [ ] Platform console: plans, module toggles, limits, suspend or resume, usage, impersonation with audit
-- [ ] Trial banner, 7-day read-only grace, suspension, scheduled retention, subscription records, message credit top-ups
 - [ ] API review for the future mobile app, OpenAPI examples, contract tests that keep `v1` stable
 - [ ] Security review (access logs, encryption, backup restore drill), accessibility pass, performance check with 50,000 leads and 10,000 units
 - [ ] User guide (English and Bangla), onboarding guide for Datatech staff, deployment guide (including custom domain TLS)
 
-**Acceptance:** full test suite green, Pint and Larastan clean, a restore drill passes, nightly reconciliation shows zero differences on the performance dataset, limits for projects, units and users are enforced everywhere (tested), and a new company can be set up with its website live and first lead captured within one day.
+**Acceptance:** full test suite green, Pint and Larastan clean, a restore drill passes, nightly reconciliation shows zero differences on the performance dataset, and a new company can be set up with its website live and first lead captured within one day.
 
 ---
 

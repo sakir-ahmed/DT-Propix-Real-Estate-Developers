@@ -1,6 +1,6 @@
 # ARCHITECTURE & CODING RULES: DT Propix
 
-> Shared engineering rules for Datatech products, adapted for DT Propix (multi-tenant SaaS for real-estate developers and agencies: public website, CRM, unit inventory, booking and installments, accounts, HR, customer portal). Sections 11 to 17 are specific to this product.
+> Shared engineering rules for Datatech products, adapted for DT Propix (one installation per company for real-estate developers and agencies: public website, CRM, unit inventory, booking and installments, accounts, HR, customer portal). Sections 11 to 17 are specific to this product.
 > If this file conflicts with the product's `prd.md`, **the PRD wins** for business rules and roles. This file wins for code structure.
 
 ---
@@ -14,7 +14,7 @@
 | Cache / Session / Queue | Redis (`CACHE_STORE`, `SESSION_DRIVER`, `QUEUE_CONNECTION` = `redis`)                                                                                      |
 | Frontend                | Inertia.js v2, Vue 3 (`<script setup>`), Tailwind CSS v4, shadcn-vue (Radix Vue)                                                                           |
 | Toasts                  | `vue-sonner`                                                                                                                                               |
-| Auth                    | Staff: username / email / mobile login. Customers: mobile OTP (separate `customer` guard, portal only). Spatie Permission with **teams** (tenant as team). |
+| Auth                    | Staff: username / email / mobile login. Customers: mobile OTP (separate `customer` guard, portal only). Spatie Permission without teams. This installation is one company. |
 | Real-time               | Not required in v1. Use page refresh and light polling; notifications go through the in-app bell, SMS and email.                                           |
 | Audit                   | `spatie/laravel-activitylog`                                                                                                                               |
 | Backup                  | `spatie/laravel-backup` (daily, via scheduler)                                                                                                             |
@@ -25,14 +25,14 @@
 | Containers              | Docker Compose: nginx, php-fpm (with Chromium), mysql, redis, queue worker, scheduler                                                                      |
 | Icons                   | Font Awesome Free via `@fortawesome/vue-fontawesome` (tree-shaken SVG), wrapped in `AppIcon`                                                               |
 | Charts                  | `chart.js` + `vue-chartjs` (one library only)                                                                                                              |
-| Multi-tenancy           | One app, shared MySQL database, `tenant_id` on every tenant-owned table (section 11)                                                                       |
+| Deployment              | One app and one database per company. No tenant id and no platform billing (section 11)                                                                    |
 | PDF                     | `spatie/laravel-pdf` with the Browsershot (headless Chromium) driver                                                                                       |
 | QR                      | `endroid/qr-code` (receipt and document verification codes)                                                                                                |
 | Translatable content    | `spatie/laravel-translatable` (English and Bangla content columns for projects, pages, posts)                                                              |
 | Images                  | `intervention/image` (WebP derivatives, responsive sizes, watermark option)                                                                                |
-| Sitemap / SEO           | `spatie/laravel-sitemap`, per-tenant `robots.txt`, JSON-LD helpers                                                                                         |
+| Sitemap / SEO           | `spatie/laravel-sitemap`, `robots.txt`, JSON-LD helpers                                                                                                    |
 | Maps                    | Leaflet with OpenStreetMap-compatible tiles (provider in `.env`); Google Maps only if the client supplies a key                                            |
-| Email                   | Laravel Mail with per-tenant SMTP or a shared provider (SES, Mailgun)                                                                                      |
+| Email                   | Laravel Mail with the company's SMTP or a shared provider (SES, Mailgun)                                                                                   |
 | WhatsApp                | WhatsApp Business Cloud API (Meta) through `MessageChannel` (section 16)                                                                                   |
 | Excel import / export   | `maatwebsite/excel`                                                                                                                                        |
 | API docs                | `dedoc/scramble` (OpenAPI at `/api-docs`)                                                                                                                  |
@@ -40,7 +40,7 @@
 
 **Rendering**
 
-- Public pages (`Web/` controllers): each tenant's corporate website (home, projects, properties, blog, careers, contact, and more). Inertia SSR with dynamic meta tags, per-tenant domain and cached output (section 13).
+- Public pages (`Web/` controllers): the company's public website (home, projects, properties, blog, careers, contact, and more). Inertia SSR with dynamic meta tags, the company's own domain and cached output (section 13).
 - The customer portal after login is client-side only.
 - Admin panel (`/admin`): client-side SPA, **SSR disabled**. No Filament.
 
@@ -76,7 +76,7 @@ app/
 4. **No over-engineering.** No factories, abstractions or patterns without a concrete need today.
 5. **Money:** store as `decimal(12,2)` in BDT. Never use floats. API returns money as strings (`"1250.00"`).
 6. **Bookings, payment schedules, collections, allocations, journal postings and payroll run inside `DB::transaction()`.** Use `lockForUpdate()` on the unit row (to stop double booking), on document number counters and on balances.
-7. **Tenant and branch scoping:** every tenant-owned model uses `BelongsToTenant`, and branch-owned models also use `BelongsToBranch` (section 11). A user must never read another tenant's data, and non-owner users must never read another branch's data. Test both.
+7. **Branch scoping:** every branch-owned model uses a global branch scope (section 11); non-owner users must never read another branch's data. Test this.
 8. **All user-facing text uses translation keys** (`__('orders.created')`), never hard-coded strings.
 9. **Secrets only in `.env`**, accessed via `config()`. Never call `env()` outside config files.
 10. **No emojis anywhere** (UI, translations, SMS, receipts, seeders, comments, commits). Icons come from Font Awesome through `AppIcon`; see `design.md` section 23.
@@ -88,9 +88,9 @@ app/
 
 ## 4. Roles & Permissions
 
-Spatie Permission with **teams enabled** (`teams => true`, team key `tenant_id`), so every role and assignment belongs to one tenant. Roles are defined in `prd.md` and seeded per tenant when the tenant is created. `super-admin` is a platform role (Datatech staff) that is not tied to a tenant.
+Spatie Permission without teams. This installation serves one company; roles are defined in `prd.md` and seeded when the installation is created. `super-admin` is a hidden Datatech login on that server, seeded from `.env`.
 
-Use permissions (`units.change-price`, `bookings.discount`, `bookings.cancel`, `refunds.approve`, `journals.post`, `payroll.approve`), not role names, in policies and `@can` checks. The root platform account comes from `.env` values (never hard-code a password).
+Use permissions (`units.change-price`, `bookings.discount`, `bookings.cancel`, `refunds.approve`, `journals.post`, `payroll.approve`), not role names, in policies and `@can` checks. The `super-admin` credentials come from `.env` values (never hard-code a password).
 
 ---
 
@@ -173,7 +173,7 @@ Use `Log` with PSR-3 levels and context arrays. Never log passwords, OTPs, token
 
 ```php
 Log::info('Order created.', ['order_id' => $order->id, 'branch_id' => $order->branch_id]);
-Log::warning('Stock below threshold.', ['ingredient_id' => $id]);
+Log::warning('Stock below threshold.', ['unit_id' => $unitId]);
 Log::error('Payment failed.', ['order_id' => $id, 'error' => $e->getMessage()]);
 ```
 
@@ -235,7 +235,7 @@ class User extends Authenticatable
 A feature is **done** only when all of these are true:
 
 - [ ] Pest feature tests cover the happy path and main failure cases
-- [ ] Authorization tested (allowed role passes, other role gets 403, other branch gets 404, **other tenant gets 404**)
+- [ ] Authorization tested (allowed role passes, other role gets 403, other branch gets 404)
 - [ ] No customer personal data in logs, URLs or error trackers (section 12)
 - [ ] Where money is involved, journals balance and the reconciliation tests pass (customer ledger, installments, accounts, commissions)
 - [ ] `./vendor/bin/pint` is clean and `./vendor/bin/phpstan` passes
@@ -248,17 +248,15 @@ A feature is **done** only when all of these are true:
 
 ---
 
-## 11. Multi-Tenancy (SaaS)
+## 11. One Company per Installation
 
-- **Model:** one application and one shared database. Every tenant-owned table has a non-null, indexed `tenant_id`, and unique keys include it (for example `unique(tenant_id, customer_code)`).
-- **Tenant resolution:** a `ResolveTenant` middleware reads the host (`{slug}.propix.example` or a custom domain). API requests take the tenant from the authenticated token. Never trust a `tenant_id` sent by the client.
-- **Traits:** `BelongsToTenant` adds a global scope and fills `tenant_id` on create. `BelongsToBranch` adds branch scoping for non-owner users. An architecture test fails if a model with a `tenant_id` column lacks the trait.
-- **Queues and scheduler:** every queued job, notification and listener carries the tenant ID and restores the tenant context before running. Per-tenant scheduled tasks loop over active tenants.
-- **Isolation by prefix:** cache keys, Redis keys and storage paths (`tenants/{id}/...` on a private disk) all include the tenant ID.
-- **Platform area (`/platform`)** for Datatech only: create tenants, plans, trial dates, subscription payments, SMS credits, storage and limits, custom domains, suspend or resume, usage, and support impersonation. Impersonation shows a permanent banner and is written to the audit log.
-- **Plan limits** are enforced in one place, a `PlanGate` service (projects, units, users, storage, modules). It returns `PLAN_LIMIT_REACHED` or `MODULE_DISABLED`. Never check plan limits in scattered controllers.
-- **Tests:** every model and every endpoint has a cross-tenant test (tenant A cannot read or write tenant B, and gets 404).
-- **Export and exit:** a command exports all of one tenant's data (CSV or JSON plus files). Tenant deletion is scheduled and only runs after the retention period.
+- **Model:** one Laravel application and one MySQL database per real-estate company. Datatech deploys both by hand and hands that server to the company. There is no `tenant_id`, no `ResolveTenant` middleware, and no client-supplied company id. Branches of one company share that server.
+- **Branches:** the company may add branches in that same database. `BelongsToBranch` scopes non-owner users to their assigned branches. Owners and the super-admin see every branch. An architecture test fails if a model with a `branch_id` column lacks the trait. Unique keys are per this database (for example `unique(customer_code)`).
+- **Queues and scheduler:** jobs run for this installation only. There is no loop over tenants.
+- **Storage:** private disk paths stay inside this server (`customers/{id}/...`). Never use public storage for customer documents.
+- **Accounts:** the seeder creates the first `owner` and the hidden Datatech `super-admin` from `.env`. There is no `/platform` console, no impersonation, no plan gate, and no subscription state.
+- **Tests:** every branch-owned model and endpoint has a cross-branch test (a manager of branch A gets 404 for branch B, including the public website and portal).
+- **Export:** a command exports this installation's data (CSV or JSON plus files).
 
 ---
 
@@ -269,7 +267,7 @@ Real-estate data is sensitive: national ID and passport copies, TIN, addresses, 
 - **Never put personal data** (customer or lead names, mobiles, NID or passport numbers, addresses, payment details) in logs, exception messages, error trackers, URLs or query strings. Use IDs only.
 - **Encrypt** NID, passport, TIN and bank account numbers with the `encrypted` cast. Searchable fields (name, mobile, customer code, booking number) stay plain so they can be indexed.
 - **Files** (agreements, deeds, NID copies, cheque images, payment proofs, floor plan originals, brochures not meant for public download) live on a private disk and are served only through authorized controllers or short-lived signed URLs. Public website media (gallery, brochures marked public) are copied to a separate public disk on publish.
-- **Least access:** sales executives see only their own leads and bookings unless the tenant widens it; unit prices, discounts and costs are permission-protected (`units.view-price`, `bookings.view-discount`, `projects.view-cost`); HR and payroll are visible only to HR roles and the owner; commission data only to permitted roles.
+- **Least access:** sales executives see only their own leads and bookings unless the owner widens it; unit prices, discounts and costs are permission-protected (`units.view-price`, `bookings.view-discount`, `projects.view-cost`); HR and payroll are visible only to HR roles and the owner; commission data only to permitted roles.
 - **Customer portal:** a customer sees only their own bookings, schedules, receipts and documents marked as visible. Anything else returns 404.
 - **Access log:** viewing a customer profile, a document, or exporting leads or customers writes an access log row. Bulk exports need a permission and are logged. Broker and employee data have the same protection.
 - **No hard deletes** of leads with activity, customers, bookings, payments, journals or documents. Use statuses or voiding with a reason. Anonymize only through a documented command.
@@ -281,10 +279,10 @@ Real-estate data is sensitive: national ID and passport copies, TIN, addresses, 
 
 ## 13. Public Website, SEO & Media
 
-- **One codebase, many websites.** A `ResolveWebsite` middleware maps the host to a tenant: `{slug}.propix.example` or a verified custom domain. Custom domains need DNS verification and automatic TLS through a front proxy (for example Caddy with on-demand TLS, or a CDN service). Unknown hosts return 404, never another tenant's site.
-- **Rendering:** Inertia SSR with dynamic meta, OpenGraph and Twitter tags. Public pages are cached per tenant and language (Redis tags, `tenant:{id}`), purged when the editor publishes or a project, unit status or price changes. Target: LCP under 2.5 seconds on a mid-range phone, Lighthouse SEO and accessibility 95 or more.
+- **One installation, one website.** The company's public website is served on the company's own domain (a local host in development). The domain needs DNS verification and automatic TLS through a front proxy (for example Caddy with on-demand TLS, or a CDN service).
+- **Rendering:** Inertia SSR with dynamic meta, OpenGraph and Twitter tags. Public pages are cached per language (Redis tags), purged when the editor publishes or a project, unit status or price changes. Target: LCP under 2.5 seconds on a mid-range phone, Lighthouse SEO and accessibility 95 or more.
 - **URLs and languages:** clean slugs, `/en/...` and `/bn/...` with `hreflang`, canonical URLs, a language switcher that keeps the page. Translatable content is stored per language; a missing translation falls back to the default language and is flagged to editors.
-- **SEO:** per-page meta fields with sensible defaults, a sitemap per tenant, `robots.txt`, a redirects manager (301 for changed slugs), and JSON-LD: `Organization`, `BreadcrumbList`, `Article`, `JobPosting`, and a listing type for projects and units.
+- **SEO:** per-page meta fields with sensible defaults, a sitemap, `robots.txt`, a redirects manager (301 for changed slugs), and JSON-LD: `Organization`, `BreadcrumbList`, `Article`, `JobPosting`, and a listing type for projects and units.
 - **Media pipeline:** uploads are validated and processed in a queue into WebP derivatives with responsive sizes; originals stay private; alt text is required for published gallery images; video is an external embed (YouTube or Vimeo) by default, with uploaded files optional and size-limited; PDFs (brochures, floor plans) can be public or **gated** (download requires lead capture).
 - **Availability on the site:** only data marked publishable appears. Each project chooses what the website shows: available units only, or also booked and sold (shown as "Sold" for social proof), and whether prices are shown or "on request". A unit that becomes booked disappears from search within a minute (cache purge).
 - **Lead capture:** every public form posts to one `CaptureLeadAction` that validates, applies anti-spam (Turnstile, honeypot, rate limit), stores UTM and referrer data, merges into an existing lead when the mobile matches (adds an activity instead of a duplicate), assigns the lead, notifies the assignee, and returns a success message. It is idempotent per submission token.
@@ -303,8 +301,8 @@ Real-estate data is sensitive: national ID and passport copies, TIN, addresses, 
 - **Price snapshot:** a booking stores the unit's area, rate, premiums, discounts, offers, extra charges and total at booking time. Later price changes never change an existing booking.
 - **Payment schedules** are generated from a template (booking money, down payment, installments, special or milestone payments, handover payments, other charges). A schedule is a set of dated, numbered rows with amounts. After the **agreement is signed**, the schedule is immutable; changes (reschedule, waiver, partial date shifts) create a new schedule **version** through the approval workflow and keep the old one for history.
 - **Allocation:** a collection is allocated to schedule rows (earliest due first, or as chosen) as stored rows. The paid and due amounts of every row are calculated from allocations. Unallocated money is an explicit **advance** on the booking. Nobody types a due amount.
-- **Late charges** (optional per tenant): computed by an idempotent job after a grace period, added as separate charge rows with a reason, waivable only through approval.
-- **Cancellation, refund and transfer** are documents with their own workflow and journal postings: cancellation applies the tenant's deduction rules; a refund schedules payments and cannot exceed what was collected minus deductions; a transfer moves the booking to a new customer with a fee and an approval, keeping the full history.
+- **Late charges** (optional company setting): computed by an idempotent job after a grace period, added as separate charge rows with a reason, waivable only through approval.
+- **Cancellation, refund and transfer** are documents with their own workflow and journal postings: cancellation applies the company's deduction rules; a refund schedules payments and cannot exceed what was collected minus deductions; a transfer moves the booking to a new customer with a fee and an approval, keeping the full history.
 - **Document numbers** (booking, agreement, receipt, voucher) are sequential per series under a lock, without gaps; voided numbers stay visible.
 
 ---
@@ -327,13 +325,13 @@ Real-estate data is sensitive: national ID and passport copies, TIN, addresses, 
 
 ## 16. Workflows, Documents, Messaging, Tasks & Scheduled Jobs
 
-- **One approval engine.** Workflows are tenant configuration: a request type (discount above a limit, booking cancellation, refund, transfer, price change, payment schedule change, expense above a limit, leave, payroll, commission payout, purchase), ordered steps (role or user, optional amount thresholds), and outcomes. `RequestApprovalAction` creates a request that blocks the business action until approved; every decision is logged with user, time and comment. The engine has an inbox, reminders and escalation after a timeout. Do not write special approval code per feature.
+- **One approval engine.** Workflows are company configuration: a request type (discount above a limit, booking cancellation, refund, transfer, price change, payment schedule change, expense above a limit, leave, payroll, commission payout, purchase), ordered steps (role or user, optional amount thresholds), and outcomes. `RequestApprovalAction` creates a request that blocks the business action until approved; every decision is logged with user, time and comment. The engine has an inbox, reminders and escalation after a timeout. Do not write special approval code per feature.
 - **Document management:** one `documents` table with category, version history, owner entity (customer, booking, unit, project, land parcel, employee, vendor), visibility (internal, customer-visible), optional expiry date with alerts, and private storage. A document is never overwritten; a new upload creates a version.
 - **Document generation:** booking forms, agreements, allotment letters, demand letters and receipts come from HTML templates with placeholders, rendered with Browsershot (headless Chromium) so Bangla renders correctly; each generated file is stored as a document with the template version used. Signed copies are uploaded scans (no e-signature in v1).
-- **Messaging:** a `MessageChannel` interface with `SmsChannel` (BdBulkSMS), `EmailChannel` and `WhatsAppChannel`. Templates per tenant, per channel and per language with placeholders and preview. Sends are queued, logged (template, channel, status, cost), rate limited, respect opt-out for non-essential messages, and SMS and WhatsApp consume prepaid tenant credits in the same transaction that writes the log. WhatsApp uses pre-approved templates; manual chat is out of scope. Bangla SMS is Unicode (70 characters per segment); show the segment count and cost before every bulk send.
+- **Messaging:** a `MessageChannel` interface with `SmsChannel` (BdBulkSMS), `EmailChannel` and `WhatsAppChannel`. Templates per channel and per language with placeholders and preview. Sends are queued, logged (template, channel, status, cost), rate limited, respect opt-out for non-essential messages, and SMS and WhatsApp consume prepaid credits in the same transaction that writes the log. WhatsApp uses pre-approved templates; manual chat is out of scope. Bangla SMS is Unicode (70 characters per segment); show the segment count and cost before every bulk send.
 - **Tasks:** one `tasks` table for generic work items (assignee, due date, priority, status, related entity). **Lead follow-ups are activities** with a due date and appear in the CRM "today" list; they are not duplicated as tasks.
 - **Imports:** `maatwebsite/excel`, queued and chunked, with a dry-run, a row-level error report, a safe re-run keyed on an external ID, and a summary. Legacy import covers leads, customers, units, bookings with payment schedules, and received payments.
-- **Scheduled jobs** (hold expiry, installment due reminders, overdue and late charge calculation, follow-up reminders, lead reassignment of inactive leads, document expiry alerts, trial expiry, backups, daily owner summary) must be **idempotent** and tenant-aware: running twice never duplicates anything, and one failing tenant never stops the others.
+- **Scheduled jobs** (hold expiry, installment due reminders, overdue and late charge calculation, follow-up reminders, lead reassignment of inactive leads, document expiry alerts, backups, daily owner summary) must be **idempotent**: running twice never duplicates anything.
 
 ---
 

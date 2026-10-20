@@ -68,7 +68,7 @@ Define tokens once in `resources/css/app.css`. Components use token classes (`bg
 **Meaning of colors**
 
 - Primary (slate): navigation, main buttons, headers.
-- Accent (violet): active tab, selected items, links, highlights. Each tenant may override the accent on its **public website and customer portal** only (section 11); the back office keeps the product accent.
+- Accent (violet): active tab, selected items, links, highlights. The company may override the accent on its **public website and customer portal** only (section 11); the back office keeps the product accent.
 - Warning (amber): on hold, partially paid, due soon, pending approval, caution badges.
 - Success (emerald): available, paid, approved, published.
 - Danger (rose): overdue, bounced, cancelled, reversal, rejected, delete.
@@ -175,8 +175,8 @@ The booking desk is the screen used most by the sales manager and the sales acco
 
 ## 11. Public Website & Customer Portal
 
-- **Public website** (per tenant, server-side rendered): home, project list with filters (location, type, status, budget), project page (gallery, video, floor plans, specifications, amenities, location map, available units summary, brochure form, enquiry form), about, news, contact. Bilingual with a language switcher and `hreflang`.
-- **Branding:** each tenant sets logo, accent color, fonts from an approved list, and cover images. The accent is validated for contrast (at least 4.5:1 for text on its background) before it can be saved; otherwise the nearest accessible shade is suggested.
+- **Public website** (server-side rendered): home, project list with filters (location, type, status, budget), project page (gallery, video, floor plans, specifications, amenities, location map, available units summary, brochure form, enquiry form), about, news, contact. Bilingual with a language switcher and `hreflang`.
+- **Branding:** the company sets logo, accent color, fonts from an approved list, and cover images. The accent is validated for contrast (at least 4.5:1 for text on its background) before it can be saved; otherwise the nearest accessible shade is suggested.
 - **Performance and quality targets:** Largest Contentful Paint under 2.5 seconds on a mid-range phone over 4G, images in WebP with sizes and lazy loading, no layout shift from late-loading media, Lighthouse accessibility score of 90 or higher, semantic headings, and alt text required on every published image.
 - **Customer portal** (mobile-first, text 16px, simple navigation): login with mobile OTP. Sections: **Home** (my units, next due, overdue alert), **Payments** (schedule, receipts, statement download, due reminders), **Documents** (agreements, letters, receipts the company marked visible), **Construction progress** (photos and percentage by milestone), **Requests** (complaints and support tickets with status), **Notices**.
 - A customer sees only their own bookings and documents. Statements and documents download through signed, short-lived URLs.
@@ -305,7 +305,7 @@ All confirm texts live in `lang/en` and `lang/bn`.
 1. **Sticky filter bar:** period presets (Today, Yesterday, 7 days, This month, Last month, Custom), branch selector (All branches / one branch), channel filter. Filters sync to the URL so a view can be shared and the Back button works.
 2. **KPI row:** 4–6 cards (Leads, Site visits, Bookings, Sales, Collection, Outstanding, Expenses, Profit). Each card: label, big value, **change vs previous period** (an arrow-up icon with +8.2% in emerald, or an arrow-down icon with −3.1% in rose; the icon, not color alone, carries the meaning), and a tiny sparkline. Clicking a card drills into the matching report with the same filters.
 3. **Main charts:** sales trend (line/area), sales by channel (donut), top items (horizontal bar), profit breakdown.
-4. **Alerts panel:** follow-ups overdue, installments overdue, holds expiring today, approvals waiting, low message credit, subscription due, each with a one-click action.
+4. **Alerts panel:** follow-ups overdue, installments overdue, holds expiring today, approvals waiting, low message credit, each with a one-click action.
 5. **Tables:** project-wise sales and collection, broker commission payable, upcoming site visits (compact, 5–10 rows with "View all").
 
 **Behavior**

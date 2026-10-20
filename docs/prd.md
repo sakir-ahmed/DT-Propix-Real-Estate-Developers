@@ -38,27 +38,13 @@ Customer: **Website -> Enquiry -> Portal (schedule, receipts, documents, progres
 
 ## 2. Business Model & Deployment _(decision)_
 
-**Multi-tenant SaaS.** One application and one shared database serve many companies (tenants). Each tenant has one or more branches, projects and a public website on a subdomain or its own domain. Isolation, export and security rules are in `architecture.md` sections 11 and 12.
+**One installation per company.** Datatech copies this codebase, creates that company's database, and points a web address at it. The app does not provision companies, and it does not bill Datatech's fee. If the company has several branches, those branches live in that same codebase and that same database. Datatech charges the customer outside this app (one-time or yearly, decided per deal).
 
-> Large developers may ask for a dedicated installation. That is a different deployment and pricing model; decide it before you quote one.
+There is no `tenant_id`, no shared database, no subdomain tenant resolver, no platform console, no impersonation, no trial, and no subscription ledger.
 
-### Pricing and plans _(suggested only; no pricing was specified, editable in the platform console)_
+> Branch isolation, export and security rules are in `architecture.md` sections 11 and 12.
 
-| Plan    | Price per month (BDT) | Limits and modules                                                                                                                                          |
-| ------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Starter | about 5,000           | 3 projects, 300 units, 5 users; website, CRM, units, booking, collections, basic reports                                                                    |
-| Growth  | about 15,000          | 10 projects, 2,000 units, 20 users; plus brokers and commission, accounts, document management, workflows, SMS and email, customer portal                   |
-| Pro     | about 40,000          | Unlimited projects and units, 60+ users; plus HR and payroll, project costing, construction progress, WhatsApp, custom domain, API access, priority support |
-
-SMS and WhatsApp are sold as prepaid credits. A one-time setup and data import fee may be charged. These are business decisions; the code only needs plan limits and module toggles (`PlanGate`) to be configurable per tenant.
-
-### Sales and onboarding flow
-
-1. **Platform console** (Datatech only): create a tenant in minutes, set plan, trial dates and limits, add message credits.
-2. **Setup wizard** for the tenant: company profile and logo, branches, projects, unit types, document number formats, payment plan templates, chart of accounts template.
-3. **Import wizard:** leads, customers, units with prices, bookings with payment schedules, and received payments, from Excel.
-4. **Website:** pick a theme, set branding, domain, menus and pages; publish.
-5. **Trial:** 30 days with a visible banner; then subscribe. After the trial, 7-day read-only grace, then suspension; data kept for 90 days and exportable.
+Change this decision only if Datatech decides to build a shared SaaS; that changes the database design.
 
 ---
 
@@ -79,7 +65,7 @@ SMS and WhatsApp are sold as prepaid credits. A one-time setup and data import f
 | `customer-support` | Complaints and requests           | Tickets, document requests, messaging                                       |
 | `web-editor`       | Website                           | Pages, projects, blog, careers, media, SEO                                  |
 
-Platform role: `super-admin` (Datatech staff), not tied to a tenant.
+`super-admin` — hidden Datatech login on that server, seeded from `.env`.
 **Customers** log in to the portal with mobile OTP and see only their own data. **Brokers** log in to a limited broker portal; they never see other brokers' leads.
 Unit prices, discounts, project costs, payroll and commission rates are visible only with their permissions (`units.view-price`, `bookings.view-discount`, `projects.view-cost`, `payroll.view`, `commission.view`).
 
@@ -87,9 +73,9 @@ Unit prices, discounts, project costs, payroll and commission rates are visible 
 
 ## 4. Modules
 
-### A. Tenants, Plans & Platform Admin (Datatech)
+### A. Company Profile & Setup
 
-Create and suspend tenants, plans, module toggles, limits, trial dates, message credits, usage, impersonation with audit log, import monitor, and a trials-ending list.
+Company profile and logo, branches (with the head office marked), document number formats, payment plan templates, chart of accounts template; setup wizard with onboarding checklist; import wizard (dry run, row-level errors, safe re-run) for leads, customers, units with prices, bookings with payment schedules, and received payments from Excel; website theme, branding, menus and pages, publishing on the company's own domain; Datatech hands over a fresh installation (app and database, `owner` and hidden `super-admin` seeded from `.env`).
 
 ### B. Public Website
 
@@ -97,8 +83,8 @@ Create and suspend tenants, plans, module toggles, limits, trial dates, message 
 - **Builder:** theme and branding (logo, accent, fonts), menus, sections with ordering, banners and sliders, bilingual content, per-page SEO fields, redirects, sitemap.
 - **Lead capture:** enquiry, callback request, site visit request, brochure download (gated), and career application forms, all through one lead pipeline with anti-spam.
 - **Media:** WebP pipeline, galleries, 360 or video embeds, public and gated PDFs.
-- **Domains:** subdomain by default, custom domain with verification and automatic TLS.
-- **Analytics hooks:** UTM capture, optional tag manager and pixel IDs per tenant.
+- **Domains:** the company's own domain, with verification and automatic TLS.
+- **Analytics hooks:** UTM capture, optional tag manager and pixel IDs.
 
 ### C. CRM & Lead Management
 
@@ -120,7 +106,7 @@ Create and suspend tenants, plans, module toggles, limits, trial dates, message 
 - **Landowner share:** units allocated to landowners under a joint venture; tracked separately and excluded from sale totals unless sold.
 - **Availability grid** (stacking plan) and plot list/map views; documents per project and unit (floor plans, approvals).
 - **Bulk tools:** import units, bulk price change with approval, block or release.
-- **Brokers' view** shows only what the tenant allows.
+- **Brokers' view** shows only what the owner allows.
 
 ### E. Booking & Sales
 
@@ -222,7 +208,7 @@ Import wizards (dry run, row errors, safe re-run), onboarding checklist and demo
 | **Collection**  | Sum of **verified, non-reversed** receipts dated in the period; a cheque counts when it is **cleared**; refunds are shown as a separate negative line.                                                                                                                                                 |
 | **Outstanding** | At the as-of date, the total of schedule rows due on or before that date minus allocated collections (this is **overdue**), and separately the total of all future rows (this is **upcoming**). Outstanding on the dashboard = overdue plus due today.                                                 |
 | **Expenses**    | Posted expense and payment vouchers in the period (operating and project costs), excluding transfers, refunds and customer receipts.                                                                                                                                                                   |
-| **Profit**      | Income statement result for the period from posted journals: recognized revenue minus expenses (revenue recognition basis is a tenant setting: on **collection** by default, or on **sale**; confirm the treatment with the client's accountant). Project profit uses the same method per cost center. |
+| **Profit**      | Income statement result for the period from posted journals: recognized revenue minus expenses (revenue recognition basis is a company setting: on **collection** by default, or on **sale**; confirm the treatment with the client's accountant). Project profit uses the same method per cost center. |
 
 Conversion percentages shown between funnel steps are lead to visit, visit to booking, booking to sale. Dashboard totals must equal report totals and ledger totals exactly.
 
@@ -241,7 +227,7 @@ Conversion percentages shown between funnel steps are lead to visit, visit to bo
 | **Receipts**                | Immutable once posted. Corrections are reversals with a reason and approval. A cheque receipt is provisional until cleared; a bounce reverses it and records a charge.                                                                                                                                           |
 | **Cancellation and refund** | The deduction rule (percentage or fixed, by stage) applies automatically; the refund cannot exceed collected minus deductions and follows an approval and payment schedule. The unit returns to available only after approval.                                                                                   |
 | **Transfer**                | Moves the booking to a new customer with a fee and approval; the old customer's history is kept.                                                                                                                                                                                                                 |
-| **Commission**              | Calculated from rules at the stages defined by the tenant; reversed (or clawed back through a deduction) on cancellation; paid only after approval; a paid statement is locked. A broker's commission is never visible to other brokers.                                                                         |
+| **Commission**              | Calculated from rules at the stages defined by the company; reversed (or clawed back through a deduction) on cancellation; paid only after approval; a paid statement is locked. A broker's commission is never visible to other brokers.                                                                         |
 | **Accounting**              | All postings go through `PostJournalEntryAction`; journals balance; posted entries are immutable; locked periods reject postings.                                                                                                                                                                                |
 | **Documents**               | Numbers are sequential per series without gaps; voided numbers remain visible. Generated documents are stored with the template version.                                                                                                                                                                         |
 | **Approvals**               | One engine; a blocked action proceeds only after approval; every decision is logged.                                                                                                                                                                                                                             |
@@ -250,8 +236,7 @@ Conversion percentages shown between funnel steps are lead to visit, visit to bo
 | **Customer privacy**        | Customer data is never shown on the public site; portal users see only their own data; exports are permission-protected and logged.                                                                                                                                                                              |
 | **Messaging**               | Non-essential messages respect opt-out; credits are deducted in the same transaction as the log; bulk sends show segments and cost first.                                                                                                                                                                        |
 | **Records**                 | No hard deletes of leads with activity, customers, bookings, payments, journals or documents.                                                                                                                                                                                                                    |
-| **Tenant isolation**        | No query may return another tenant's data. Tested for every model and endpoint.                                                                                                                                                                                                                                  |
-| **Plan limits**             | Projects, units, users, storage and modules are enforced centrally with a clear message and an upgrade path.                                                                                                                                                                                                     |
+| **Branch isolation**        | Non-owner users see only their assigned branches; another branch returns 404. Tested for every model and endpoint.                                                                                                                                                                                                |
 | **Regulatory**              | Registration, stamp duty, VAT, referral/commission and data protection rules must be confirmed with a lawyer and accountant before the client uses the forms and templates. Templates are editable and carry no legal guarantee.                                                                                 |
 
 ---
@@ -267,9 +252,9 @@ Conversion percentages shown between funnel steps are lead to visit, visit to bo
 ## 7. Non-Functional Requirements
 
 - **Localization:** UI, website, documents and messages in `en` and `bn`.
-- **Performance:** dashboard under 3 seconds for a tenant with 20,000 leads, 5,000 units and 3 years of data; availability grid under 1 second for 1,000 units; booking save under 1 second; public pages LCP under 2.5 seconds on mid-range phones; cached public pages served in under 200 ms.
-- **Scale targets:** a tenant with 50,000 leads, 10,000 units, 5,000 bookings and 100,000 journal lines remains responsive using indexes and aggregated tables.
-- **Security:** HTTPS only, encrypted sensitive fields, private file storage with signed URLs, access logs for exports and document views, rate limits, idle timeout, encrypted backups, tenant isolation.
+- **Performance:** dashboard under 3 seconds for a company with 20,000 leads, 5,000 units and 3 years of data; availability grid under 1 second for 1,000 units; booking save under 1 second; public pages LCP under 2.5 seconds on mid-range phones; cached public pages served in under 200 ms.
+- **Scale targets:** a company with 50,000 leads, 10,000 units, 5,000 bookings and 100,000 journal lines remains responsive using indexes and aggregated tables.
+- **Security:** HTTPS only, encrypted sensitive fields, private file storage with signed URLs, access logs for exports and document views, rate limits, idle timeout, encrypted backups, branch isolation.
 - **Audit:** activity log for price changes, discounts, status changes, cancellations, refunds, transfers, receipt reversals, cheque changes, approvals, role changes, and exports.
 - **SEO and accessibility:** Lighthouse SEO and accessibility scores of 95 and 90 or more on public pages.
 - **Availability:** target 99.5% monthly; planned maintenance outside working hours.
@@ -294,7 +279,6 @@ Conversion percentages shown between funnel steps are lead to visit, visit to bo
 | customer-support    | Tickets, requests, document requests, messages                                                                        |
 | web-editor          | Pages, projects, blog, careers, media, SEO, redirects                                                                 |
 | customer (portal)   | Home, payments, documents, construction progress, requests, notices                                                   |
-| platform (Datatech) | Tenants, plans and trials, usage, credits, impersonation, import monitor                                              |
 
 ---
 
@@ -303,13 +287,13 @@ Conversion percentages shown between funnel steps are lead to visit, visit to bo
 - Native mobile apps (separate project; this project provides the API).
 - Online gateway payments (bKash, Nagad, cards) for installments; payment proof upload with verification is included. Gateway integration is a later module.
 - Electronic signatures; signed agreements are uploaded scans.
-- **Rental and facility management** (tenants, leases, rent invoices, maintenance contracts, service charges). The package targets sales; a property-management module is a later pack and should be confirmed with prospects who manage rented property.
+- **Rental and facility management** (leases, rent invoices, maintenance contracts, service charges). The package targets sales; a property-management module is a later pack and should be confirmed with prospects who manage rented property.
 - Full ERP procurement, inventory and manufacturing; only simple project purchases and bills are included.
 - Government registration or e-filing integrations.
 - Advanced BIM, drone, or 3D walkthrough tools (video and 360 embeds are supported).
 - Deep payroll tax compliance and statutory filing.
 - Marketplace portal combining multiple companies' listings.
-- Dedicated per-client installations unless agreed separately.
+- Multi-tenant SaaS, a shared database, a platform console, subscription billing, trials, plan limits, impersonation.
 
 ---
 
@@ -357,13 +341,11 @@ Conversion percentages shown between funnel steps are lead to visit, visit to bo
     - Done when: the funnel and all KPIs equal the reports and ledgers (tested), and nightly reconciliation shows no differences.
 21. **Import.** _As Datatech support, I digitize a company in a day._
     - Done when: a dry run reports row errors, the real import is repeatable without duplicates, and opening balances appear in the customer ledger.
-22. **Tenant isolation.** _As a company, my data is never visible to another._
-    - Done when: automated tests prove that every model and endpoint returns 404 across tenants, including the public website and portal.
-23. **Subscription and trial.** _As Datatech, I run a trial and bill the tenant._
-    - Done when: a banner shows days left, limits are enforced, expiry goes to read-only for 7 days and then suspension, and data can be exported.
+22. **Branch isolation.** _As a company, my data is never visible to another branch._
+    - Done when: automated tests prove that every model and endpoint returns 404 across branches, including the public website and portal.
 
 ---
 
 ## 11. Phasing
 
-See `roadmap.md`. Build phase by phase; do not implement later phases early. The first sellable release is Phases 0 to 7 (website, CRM, inventory, booking, collections, dashboard); the rest are upgrades by plan.
+See `roadmap.md`. Build phase by phase; do not implement later phases early. The first sellable release is Phases 0 to 7 (website, CRM, inventory, booking, collections, dashboard); the rest are later modules.

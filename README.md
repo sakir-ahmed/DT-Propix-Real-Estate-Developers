@@ -9,7 +9,7 @@ DT Propix gives developers, agencies and property companies one system for their
 Leads -> Site Visits -> Bookings -> Sales -> Collection -> Outstanding -> Expenses -> Profit
 ```
 
-Built for real-estate developers, agencies, property management companies (sales side), land and project businesses, and commercial property businesses. Bilingual (English and Bangla). Multi-tenant SaaS: many companies on one platform.
+Built for real-estate developers, agencies, property management companies (sales side), land and project businesses, and commercial property businesses. Bilingual (English and Bangla). Datatech deploys one copy of this app and one database for each real-estate company. Branches of one company share that server.
 
 > This project is built phase by phase from the specification in `docs/`. Start with `docs/roadmap.md`. The mobile app is a separate project; this repository provides the API.
 
@@ -30,7 +30,6 @@ Built for real-estate developers, agencies, property management companies (sales
 - **Messaging:** SMS, email and WhatsApp with templates and prepaid credits
 - **Customer portal:** schedule, receipts, documents, construction progress, requests
 - **Management dashboard and reports:** the full funnel with drill-down
-- **Platform console (Datatech):** tenants, plans, trials, credits, domains, import monitor
 
 Full scope and business rules: `docs/prd.md`.
 
@@ -41,11 +40,11 @@ Full scope and business rules: `docs/prd.md`.
 | Area                  | Technology                                                              |
 | --------------------- | ----------------------------------------------------------------------- |
 | Backend               | Laravel 13.x, PHP 8.3+                                                  |
-| Database              | MySQL 8 (shared database, `tenant_id` isolation)                        |
+| Database              | MySQL 8 (one database per installation)                                 |
 | Cache, session, queue | Redis                                                                   |
 | Frontend              | Inertia.js v2, Vue 3, Tailwind CSS v4, shadcn-vue, SSR for public pages |
 | Icons, charts, maps   | Font Awesome Free, Chart.js, Leaflet                                    |
-| Auth and roles        | Laravel Sanctum, Spatie Permission (teams), customer OTP guard          |
+| Auth and roles        | Laravel Sanctum, Spatie Permission, customer OTP guard                  |
 | Audit and backup      | Spatie Activitylog, Spatie Backup                                       |
 | PDF, import, media    | spatie/laravel-pdf (Browsershot), Laravel Excel, Intervention Image     |
 | Messaging             | BdBulkSMS, Laravel Mail, WhatsApp Cloud API                             |
@@ -61,9 +60,9 @@ AI coding agents read `CLAUDE.md` first.
 
 | File                   | Purpose                                                                                                              |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `docs/prd.md`          | Product requirements: roles, modules, funnel definitions, business rules, plans, scope                               |
-| `docs/architecture.md` | Stack, structure, coding rules, multi-tenancy, website and SEO, booking and accounting integrity, Definition of Done |
-| `docs/api.md`          | API conventions, public, back-office, portal and platform endpoints                                                  |
+| `docs/prd.md`          | Product requirements: roles, modules, funnel definitions, business rules, scope                                      |
+| `docs/architecture.md` | Stack, structure, coding rules, deployment, website and SEO, booking and accounting integrity, Definition of Done    |
+| `docs/api.md`          | API conventions, public, back-office and portal endpoints                                                            |
 | `docs/design.md`       | Design system, booking desk, availability grid, CRM, website and portal, icons, sizing, tables                       |
 | `docs/roadmap.md`      | Build phases with acceptance criteria                                                                                |
 | `docs/ui-preview.html` | Static visual mockup of the intended UI (open in a browser)                                                          |
@@ -96,22 +95,14 @@ docker compose exec app npm run dev
 
 The service name `app` follows the Docker Compose file created in Phase 0; adjust if yours differs.
 
-The platform administrator is created by the seeder from `.env` (never commit real values):
-
-```text
-PLATFORM_ADMIN_NAME=
-PLATFORM_ADMIN_EMAIL=
-PLATFORM_ADMIN_PASSWORD=
-```
-
-For local development the seeder also creates two demo companies so tenant isolation can be tested. Demo websites are served on `{slug}.propix.test` hosts (add them to your hosts file or use a local wildcard DNS).
+The seeder creates the first `owner` and the hidden Datatech `super-admin` from `.env` (never commit real values). For local development the seeder also creates one demo company with branches.
 
 ### Background processes
 
 | Process                                                                         | Command                     |
 | ------------------------------------------------------------------------------- | --------------------------- |
 | Queue worker                                                                    | `php artisan queue:work`    |
-| Scheduler (hold expiry, reminders, late charges, alerts, trial expiry, backups) | `php artisan schedule:work` |
+| Scheduler (hold expiry, reminders, late charges, alerts, backups) | `php artisan schedule:work` |
 
 ---
 
@@ -127,7 +118,7 @@ php artisan migrate:fresh --seed
 Rules:
 
 - Build one roadmap phase at a time; finish its acceptance criteria and the Definition of Done in `docs/architecture.md`.
-- Every feature has Pest tests, including authorization, scope, and **cross-tenant isolation**.
+- Every feature has Pest tests, including authorization, scope, and **cross-branch isolation**.
 - Unit status only through `ChangeUnitStatusAction`; journals only through `PostJournalEntryAction`; reconciliation tests must pass.
 - Never put customer personal data in logs or URLs.
 - No emojis anywhere. Icons come from Font Awesome through `AppIcon`.
@@ -137,7 +128,7 @@ Rules:
 
 ## Roles
 
-Tenant roles: `owner`, `general-manager`, `sales-manager`, `sales-executive`, `telecaller`, `broker`, `sales-accountant`, `accountant`, `project-manager`, `hr-manager`, `customer-support`, `web-editor`. Customers log in to the portal with mobile OTP. Platform role: `super-admin`.
+Company roles: `owner`, `general-manager`, `sales-manager`, `sales-executive`, `telecaller`, `broker`, `sales-accountant`, `accountant`, `project-manager`, `hr-manager`, `customer-support`, `web-editor`. Customers log in to the portal with mobile OTP. The hidden Datatech `super-admin` is seeded from `.env`.
 
 ---
 
@@ -150,6 +141,8 @@ Tenant roles: `owner`, `general-manager`, `sales-manager`, `sales-executive`, `t
 - Schedule encrypted daily backups and test a restore before onboarding real companies.
 - Run the nightly reconciliation (receivables, cash and bank, project profit) and alert on any difference.
 - Confirm registration and stamp duty forms, VAT, referral and commission rules, data protection, and message sender ID rules with a lawyer and accountant. Templates ship as editable defaults without legal guarantee.
+
+Note: the Phase 0 migrations (`plans`, `tenants` with trial/credits columns) still reflect the earlier SaaS design; removing them is tracked separately.
 
 ---
 
