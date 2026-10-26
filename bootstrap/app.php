@@ -2,8 +2,11 @@
 
 use App\Http\Middleware\DisableInertiaSsr;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\HandleWebsiteRedirects;
+use App\Http\Middleware\HandleWebsiteRequests;
 use App\Http\Middleware\IdleTimeout;
 use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\SetWebsiteLocale;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -24,6 +27,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'locale' => SetLocale::class,
             'inertia' => HandleInertiaRequests::class,
             'no-ssr' => DisableInertiaSsr::class,
+            'website.locale' => SetWebsiteLocale::class,
+            'website' => HandleWebsiteRequests::class,
+            'website.redirects' => HandleWebsiteRedirects::class,
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('admin.login'));

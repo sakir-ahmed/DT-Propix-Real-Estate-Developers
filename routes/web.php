@@ -11,9 +11,87 @@ use App\Http\Controllers\Admin\LocaleController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\UiKitController;
 use App\Http\Controllers\Admin\UnitController;
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Web\AboutController;
+use App\Http\Controllers\Web\BrochureController;
+use App\Http\Controllers\Web\CareerController;
+use App\Http\Controllers\Web\ContactController;
+use App\Http\Controllers\Web\EnquiryController;
+use App\Http\Controllers\Web\FaqController;
+use App\Http\Controllers\Web\HomeController;
+use App\Http\Controllers\Web\LocaleRedirectController;
+use App\Http\Controllers\Web\PageController;
+use App\Http\Controllers\Web\PostController;
+use App\Http\Controllers\Web\ProjectController as WebProjectController;
+use App\Http\Controllers\Web\RobotsController;
+use App\Http\Controllers\Web\ServiceController;
+use App\Http\Controllers\Web\SitemapController;
+use App\Http\Controllers\Web\TeamController;
+use App\Http\Controllers\Web\TestimonialController;
 use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Public website (server-side rendered, /en/... and /bn/...)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('website.redirects')->group(function (): void {
+    Route::get('/', LocaleRedirectController::class)->name('home');
+    Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+    Route::get('/robots.txt', RobotsController::class)->name('robots');
+    Route::get('/brochures/{project}/download', [BrochureController::class, 'download'])
+        ->middleware('signed')
+        ->name('web.brochures.download');
+
+    // Retired URLs from the redirects manager land here before the 404.
+    Route::fallback(fn () => abort(404))->middleware('website.redirects');
+
+    Route::prefix('{locale}')
+        ->whereIn('locale', ['en', 'bn'])
+        ->middleware(['website.locale', 'website'])
+        ->name('web.')
+        ->group(function (): void {
+            Route::get('/', HomeController::class)->name('home');
+            Route::get('/about', AboutController::class)->name('about');
+
+            Route::get('/projects', [WebProjectController::class, 'index'])->name('projects.index');
+            Route::get('/projects/{project:slug}', [WebProjectController::class, 'show'])->name('projects.show');
+
+            Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+            Route::get('/services/{service:slug}', [ServiceController::class, 'show'])->name('services.show');
+
+            Route::get('/news', [PostController::class, 'index'])->name('news.index');
+            Route::get('/news/{post:slug}', [PostController::class, 'show'])->name('news.show');
+
+            Route::get('/careers', [CareerController::class, 'index'])->name('careers.index');
+            Route::get('/careers/{jobPost:slug}', [CareerController::class, 'show'])->name('careers.show');
+            Route::post('/careers/{jobPost:slug}/apply', [CareerController::class, 'apply'])
+                ->middleware('throttle:website-forms')
+                ->name('careers.apply');
+
+            Route::get('/team', TeamController::class)->name('team');
+            Route::get('/testimonials', TestimonialController::class)->name('testimonials');
+            Route::get('/faq', FaqController::class)->name('faq');
+            Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+
+            Route::post('/enquiries', [EnquiryController::class, 'store'])
+                ->middleware('throttle:website-forms')
+                ->name('enquiries.store');
+            Route::post('/brochure-requests', [BrochureController::class, 'store'])
+                ->middleware('throttle:website-forms')
+                ->name('brochures.store');
+
+            Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
+            Route::get('/terms', [PageController::class, 'terms'])->name('terms');
+            Route::get('/pages/{page:slug}', [PageController::class, 'show'])->name('pages.show');
+        });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Back office (client-side SPA, SSR disabled)
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware(['locale', 'no-ssr', 'inertia'])->group(function (): void {
     Route::middleware('guest')->group(function (): void {
@@ -58,14 +136,4 @@ Route::middleware(['locale', 'no-ssr', 'inertia'])->group(function (): void {
 
         Route::get('/admin/collections', [CollectionController::class, 'index'])->name('admin.collections.index');
     });
-
-    Route::get('/', function (Request $request) {
-        $user = $request->user();
-
-        if ($user instanceof User) {
-            return redirect()->route('admin.dashboard');
-        }
-
-        return redirect()->route('admin.login');
-    })->name('home');
 });

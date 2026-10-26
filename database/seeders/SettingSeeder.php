@@ -24,6 +24,17 @@ class SettingSeeder extends Seeder
         'sales.discount_percent_limit' => 5,
         'accounting.revenue_recognition' => 'collection',
         'accounting.late_charges_enabled' => false,
+        'website.tagline' => ['en' => 'Homes built on trust', 'bn' => 'বিশ্বাসের ভিত্তিতে গড়া বাড়ি'],
+        'website.office_hours' => ['en' => 'Saturday to Thursday, 9:00 to 18:00', 'bn' => 'শনিবার থেকে বৃহস্পতিবার, সকাল ৯টা থেকে সন্ধ্যা ৬টা'],
+        'website.whatsapp' => null,
+        'website.facebook' => null,
+        'website.youtube' => null,
+        'website.linkedin' => null,
+        'website.map_lat' => null,
+        'website.map_lng' => null,
+        'website.established_year' => null,
+        'website.analytics_id' => null,
+        'website.milestones' => [],
     ];
 
     public function run(): void

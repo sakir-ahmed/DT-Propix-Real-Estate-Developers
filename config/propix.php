@@ -17,6 +17,15 @@ return [
         'enabled' => filter_var(env('IS_DEMO', false), FILTER_VALIDATE_BOOLEAN),
     ],
 
+    'website' => [
+        'cache_seconds' => 3600,
+        'per_page' => 12,
+        'posts_per_page' => 9,
+        'form_rate_limit_per_minute' => 5,
+        'submission_token_hours' => 24,
+        'brochure_link_minutes' => 30,
+    ],
+
     'roles' => [
         'owner',
         'general-manager',

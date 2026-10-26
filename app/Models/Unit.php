@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\UnitStatus;
+use App\Models\Concerns\PurgesWebsiteCache;
 use Database\Factories\UnitFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,7 +24,7 @@ use Spatie\Activitylog\Support\LogOptions;
 class Unit extends Model
 {
     /** @use HasFactory<UnitFactory> */
-    use HasFactory, LogsActivity;
+    use HasFactory, LogsActivity, PurgesWebsiteCache;
 
     public function getActivitylogOptions(): LogOptions
     {

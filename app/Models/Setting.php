@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\PurgesWebsiteCache;
 use Database\Factories\SettingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,7 +21,7 @@ use Spatie\Activitylog\Support\LogOptions;
 class Setting extends Model
 {
     /** @use HasFactory<SettingFactory> */
-    use HasFactory, LogsActivity;
+    use HasFactory, LogsActivity, PurgesWebsiteCache;
 
     public const string CACHE_KEY = 'settings';
 

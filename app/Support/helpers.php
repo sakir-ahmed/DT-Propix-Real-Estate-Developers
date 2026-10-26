@@ -31,3 +31,19 @@ if (! function_exists('normalize_bd_mobile')) {
         return $digits;
     }
 }
+
+if (! function_exists('format_bd_mobile')) {
+    /**
+     * Formats a stored mobile (8801XXXXXXXXX) for display as +880 1XXX-XXXXXX.
+     */
+    function format_bd_mobile(string $mobile): string
+    {
+        $digits = normalize_bd_mobile($mobile);
+
+        if (preg_match('/^880(1\d{3})(\d{6})$/', $digits, $matches) === 1) {
+            return '+880 '.$matches[1].'-'.$matches[2];
+        }
+
+        return $mobile;
+    }
+}
