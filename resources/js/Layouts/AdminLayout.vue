@@ -48,8 +48,7 @@ function logout() {
                 </nav>
             </aside>
             <div class="min-w-0 flex-1">
-                <header class="flex h-12 items-center justify-between border-b border-border px-4">
-                    <p class="truncate text-[13px] text-muted">{{ page.props.tenant?.name }}</p>
+                <header class="flex h-12 items-center justify-end border-b border-border px-4">
                     <div class="flex items-center gap-2">
                         <LanguageSwitch />
                         <ThemeToggle />

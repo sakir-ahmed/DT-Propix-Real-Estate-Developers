@@ -1,13 +1,8 @@
 <?php
 
 use App\Http\Middleware\DisableInertiaSsr;
-use App\Http\Middleware\EnsureSuperAdmin;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\IdleTimeout;
-use App\Http\Middleware\MatchTenantUser;
-use App\Http\Middleware\ResolveApiTenant;
-use App\Http\Middleware\ResolveTenant;
-use App\Http\Middleware\ResolveWebsite;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -25,12 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'tenant' => ResolveTenant::class,
-            'website' => ResolveWebsite::class,
-            'api-tenant' => ResolveApiTenant::class,
             'idle' => IdleTimeout::class,
-            'tenant-user' => MatchTenantUser::class,
-            'super-admin' => EnsureSuperAdmin::class,
             'locale' => SetLocale::class,
             'inertia' => HandleInertiaRequests::class,
             'no-ssr' => DisableInertiaSsr::class,

@@ -8,7 +8,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 it('renders every ui kit component for an authenticated admin', function () {
     $this->seed();
 
-    $admin = User::query()->withoutGlobalScope('tenant')->where('is_super_admin', true)->firstOrFail();
+    $admin = User::query()->where('is_super_admin', true)->firstOrFail();
 
     $this->actingAs($admin)
         ->get('/admin/ui-kit')
@@ -25,7 +25,7 @@ it('renders every ui kit component for an authenticated admin', function () {
 it('switches the locale shared with inertia', function () {
     $this->seed();
 
-    $admin = User::query()->withoutGlobalScope('tenant')->where('is_super_admin', true)->firstOrFail();
+    $admin = User::query()->where('is_super_admin', true)->firstOrFail();
 
     $this->actingAs($admin)
         ->get('/locale/bn')

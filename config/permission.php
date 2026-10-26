@@ -1,6 +1,6 @@
 <?php
 
-use App\Support\TenantTeamResolver;
+use Spatie\Permission\DefaultTeamResolver;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -106,11 +106,11 @@ return [
         'model_morph_key' => 'model_id',
 
         /*
-         * Change this if you want to use the teams feature and your related model's
+         * When you want to use the teams feature and your related model's
          * foreign key is other than `team_id`.
          */
 
-        'team_foreign_key' => 'tenant_id',
+        'team_foreign_key' => 'team_id',
     ],
 
     /*
@@ -148,12 +148,12 @@ return [
      * (view the latest version of this package's migration file)
      */
 
-    'teams' => true,
+    'teams' => false,
 
     /*
      * The class to use to resolve the permissions team id
      */
-    'team_resolver' => TenantTeamResolver::class,
+    'team_resolver' => DefaultTeamResolver::class,
 
     /*
      * Passport Client Credentials Grant

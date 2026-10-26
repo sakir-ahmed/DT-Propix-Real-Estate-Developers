@@ -4,20 +4,43 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
 use Database\Factories\BranchFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 
-#[Fillable(['tenant_id', 'name', 'code', 'address', 'is_head_office'])]
+#[Fillable(['name', 'code', 'address', 'is_head_office'])]
 class Branch extends Model
 {
     /** @use HasFactory<BranchFactory> */
-    use BelongsToTenant, HasFactory, LogsActivity;
+    use HasFactory, LogsActivity;
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope('own-branch', function (Builder $builder): void {
+            $guard = auth()->guard();
+
+            if (! $guard->hasUser()) {
+                return;
+            }
+
+            $user = $guard->user();
+
+            if (! $user instanceof User || $user->is_super_admin) {
+                return;
+            }
+
+            if ($user->canAccessAllBranches()) {
+                return;
+            }
+
+            $builder->where($builder->getModel()->qualifyColumn('id'), $user->branch_id);
+        });
+    }
 
     /**
      * @return array<string, string>

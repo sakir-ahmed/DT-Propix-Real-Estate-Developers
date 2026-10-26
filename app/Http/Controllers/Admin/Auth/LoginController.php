@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use App\Support\DemoMode;
-use App\Support\TenantContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,15 +32,9 @@ class LoginController extends Controller
     {
         abort_unless($demoMode->enabled(), 404);
 
-        $user = User::query()->withoutGlobalScopes()->find($request->integer('user_id'));
+        $user = User::query()->find($request->integer('user_id'));
 
         if (! $user instanceof User) {
-            abort(404);
-        }
-
-        $tenantId = app(TenantContext::class)->id();
-
-        if ($tenantId !== null && ! $user->is_super_admin && $user->tenant_id !== $tenantId) {
             abort(404);
         }
 
@@ -63,35 +56,23 @@ class LoginController extends Controller
         $request->session()->regenerate();
         $request->session()->put('last_activity_at', now()->getTimestamp());
 
-        if ($user->is_super_admin) {
-            return redirect()->route('platform.tenants.index');
-        }
-
         return redirect()->intended(route('admin.dashboard'));
     }
 
     /**
-     * @return list<array{id: int, name: string, username: string, email: string, company: string|null}>
+     * @return list<array{id: int, name: string, username: string, email: string}>
      */
     private function demoUsers(): array
     {
-        $tenantId = app(TenantContext::class)->id();
-
-        $query = User::query()
-            ->withoutGlobalScopes()
-            ->with('tenant:id,name')
-            ->orderBy('name');
-
-        if ($tenantId !== null) {
-            $query->where('tenant_id', $tenantId);
-        }
-
-        return $query->get()->map(fn (User $user): array => [
-            'id' => $user->id,
-            'name' => $user->name,
-            'username' => $user->username,
-            'email' => $user->email,
-            'company' => $user->is_super_admin ? null : $user->tenant?->name,
-        ])->all();
+        return User::query()
+            ->orderBy('name')
+            ->get()
+            ->map(fn (User $user): array => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => $user->email,
+            ])
+            ->all();
     }
 }

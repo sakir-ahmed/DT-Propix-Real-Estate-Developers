@@ -19,8 +19,6 @@ return [
     'demo_name' => 'নাম',
     'demo_username' => 'ব্যবহারকারীর নাম',
     'demo_email' => 'ইমেল',
-    'demo_company' => 'প্রতিষ্ঠান',
-    'demo_platform' => 'প্ল্যাটফর্ম',
     'demo_login' => 'Login',
     'otp_message' => 'আপনার যাচাইকরণ কোড :code',
     'otp_sent' => 'যাচাইকরণ কোড পাঠানো হয়েছে।',

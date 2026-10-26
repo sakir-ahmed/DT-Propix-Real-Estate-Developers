@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Requests\Auth;
 
 use App\Models\User;
-use App\Support\TenantContext;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
@@ -56,19 +55,8 @@ class LoginRequest extends FormRequest
 
         $credentials = $this->getCredentials();
         $field = (string) array_key_first($credentials);
-        $tenantId = app(TenantContext::class)->id();
 
-        $query = User::query()
-            ->withoutGlobalScope('tenant')
-            ->where($field, $credentials[$field]);
-
-        if ($tenantId === null) {
-            $query->where('is_super_admin', true);
-        } else {
-            $query->where('tenant_id', $tenantId);
-        }
-
-        $user = $query->first();
+        $user = User::query()->where($field, $credentials[$field])->first();
         $password = $credentials['password'];
 
         if (! $user instanceof User || ! Hash::check($password, $user->password)) {

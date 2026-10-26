@@ -66,7 +66,7 @@ AI coding agents read `CLAUDE.md` first.
 | `docs/api.md`          | API conventions, public, back-office and portal endpoints                                                            |
 | `docs/design.md`       | Design system, booking desk, availability grid, CRM, website and portal, icons, sizing, tables                       |
 | `docs/roadmap.md`      | Build phases with acceptance criteria                                                                                |
-| `docs/ui-preview.html` | Static visual mockup of the intended UI (open in a browser)                                                          |
+| `docs/ui.html`         | Placeholder for the static UI design mockup (open in a browser; currently empty)                                     |
 
 ---
 
@@ -96,7 +96,7 @@ docker compose exec app npm run dev
 
 The service name `app` follows the Docker Compose file created in Phase 0; adjust if yours differs.
 
-The seeder creates the first `owner` and the hidden Datatech `super-admin` from `.env` (never commit real values). For local development the seeder also creates one demo company with branches.
+The seeder creates the first `owner` (`owner` / `password`) and the hidden Datatech `super-admin` (`superadmin` / `password`) with the fixed starter credentials in `database/seeders/CompanySeeder.php`; change both passwords right after the first sign-in. Re-seeding never overwrites an existing account. It also seeds the company's head office plus one satellite branch, and the default installation settings (`settings` key-value table, read with `setting('sales.hold_hours')` and friends).
 
 ### Docker
 
@@ -142,7 +142,7 @@ Rules:
 
 ## Roles
 
-Company roles: `owner`, `general-manager`, `sales-manager`, `sales-executive`, `telecaller`, `broker`, `sales-accountant`, `accountant`, `project-manager`, `hr-manager`, `customer-support`, `web-editor`. Customers log in to the portal with mobile OTP. The hidden Datatech `super-admin` is seeded from `.env`.
+Company roles: `owner`, `general-manager`, `sales-manager`, `sales-executive`, `telecaller`, `broker`, `sales-accountant`, `accountant`, `project-manager`, `hr-manager`, `customer-support`, `web-editor`. Customers log in to the portal with mobile OTP. The hidden Datatech `super-admin` is seeded by `CompanySeeder` with a starter password that is changed at handover.
 
 ---
 
@@ -155,8 +155,6 @@ Company roles: `owner`, `general-manager`, `sales-manager`, `sales-executive`, `
 - Schedule encrypted daily backups and test a restore before onboarding real companies.
 - Run the nightly reconciliation (receivables, cash and bank, project profit) and alert on any difference.
 - Confirm registration and stamp duty forms, VAT, referral and commission rules, data protection, and message sender ID rules with a lawyer and accountant. Templates ship as editable defaults without legal guarantee.
-
-Note: the Phase 0 migrations (`plans`, `tenants` with trial/credits columns) still reflect the earlier SaaS design; removing them is tracked separately.
 
 ---
 

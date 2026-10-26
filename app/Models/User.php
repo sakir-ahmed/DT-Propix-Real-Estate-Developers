@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToBranch;
-use App\Models\Concerns\BelongsToTenant;
-use App\Support\TenantContext;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -19,7 +17,6 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable([
-    'tenant_id',
     'branch_id',
     'name',
     'username',
@@ -34,7 +31,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use BelongsToBranch, BelongsToTenant, HasApiTokens, HasFactory, HasRoles, LogsActivity, Notifiable;
+    use BelongsToBranch, HasApiTokens, HasFactory, HasRoles, LogsActivity, Notifiable;
 
     /**
      * @return array<string, string>
@@ -61,10 +58,6 @@ class User extends Authenticatable
     {
         if ($this->is_super_admin) {
             return true;
-        }
-
-        if (app(TenantContext::class)->id() === null) {
-            return false;
         }
 
         return $this->hasAnyRole(['owner', 'general-manager', 'accountant']);

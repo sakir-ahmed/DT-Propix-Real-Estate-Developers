@@ -32,9 +32,6 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
-        <env name="PLATFORM_ADMIN_PASSWORD" value="password"/>
-        <env name="DEMO_OWNER_PASSWORD" value="password"/>
-        <env name="PROPIX_DOMAIN" value="propix.test"/>
         <env name="INERTIA_SSR_ENABLED" value="false"/>
         <env name="BDBULKSMS_URL" value="https://bdbulksms.example/send"/>
         <env name="BDBULKSMS_TOKEN" value="test-token"/>

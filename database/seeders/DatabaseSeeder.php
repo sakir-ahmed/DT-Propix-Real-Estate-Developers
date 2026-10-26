@@ -11,9 +11,14 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            PlanSeeder::class,
-            PlatformAdminSeeder::class,
-            DemoTenantSeeder::class,
+            SettingSeeder::class,
+            CompanySeeder::class,
         ]);
+
+        if (app()->environment('local', 'testing')) {
+            $this->call([
+                DemoDataSeeder::class,
+            ]);
+        }
     }
 }

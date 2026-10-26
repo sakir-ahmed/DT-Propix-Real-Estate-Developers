@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Jobs\SendSmsJob;
-use App\Support\TenantCache;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 
 class OtpService
 {
-    public function __construct(private TenantCache $cache) {}
-
     public function send(string $mobile, string $ip): bool
     {
         $mobile = normalize_bd_mobile($mobile);
@@ -27,7 +25,7 @@ class OtpService
 
         $code = (string) random_int(100000, 999999);
 
-        $this->cache->put($this->key($mobile), [
+        Cache::put($this->key($mobile), [
             'hash' => Hash::make($code),
             'attempts' => 0,
         ], (int) config('propix.otp.ttl_seconds'));
@@ -41,7 +39,7 @@ class OtpService
     {
         $mobile = normalize_bd_mobile($mobile);
         $key = $this->key($mobile);
-        $payload = $this->cache->get($key);
+        $payload = Cache::get($key);
 
         if (! is_array($payload) || ! isset($payload['hash'], $payload['attempts'])) {
             return false;
@@ -51,7 +49,7 @@ class OtpService
         $attempts = (int) $payload['attempts'];
 
         if ($attempts >= $maxAttempts) {
-            $this->cache->forget($key);
+            Cache::forget($key);
 
             return false;
         }
@@ -60,16 +58,16 @@ class OtpService
             $attempts++;
 
             if ($attempts >= $maxAttempts) {
-                $this->cache->forget($key);
+                Cache::forget($key);
             } else {
                 $payload['attempts'] = $attempts;
-                $this->cache->put($key, $payload, (int) config('propix.otp.ttl_seconds'));
+                Cache::put($key, $payload, (int) config('propix.otp.ttl_seconds'));
             }
 
             return false;
         }
 
-        $this->cache->forget($key);
+        Cache::forget($key);
 
         return true;
     }

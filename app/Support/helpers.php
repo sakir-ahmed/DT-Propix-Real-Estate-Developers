@@ -2,8 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Models\Tenant;
-use App\Support\TenantContext;
+use App\Support\Settings;
+
+if (! function_exists('setting')) {
+    function setting(string $key, mixed $default = null): mixed
+    {
+        return app(Settings::class)->get($key, $default);
+    }
+}
 
 if (! function_exists('normalize_bd_mobile')) {
     function normalize_bd_mobile(string $mobile): string
@@ -23,19 +29,5 @@ if (! function_exists('normalize_bd_mobile')) {
         }
 
         return $digits;
-    }
-}
-
-if (! function_exists('tenant')) {
-    function tenant(): ?Tenant
-    {
-        return app(TenantContext::class)->tenant();
-    }
-}
-
-if (! function_exists('tenant_id')) {
-    function tenant_id(): ?int
-    {
-        return app(TenantContext::class)->id();
     }
 }

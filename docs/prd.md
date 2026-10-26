@@ -65,7 +65,7 @@ Change this decision only if Datatech decides to build a shared SaaS; that chang
 | `customer-support` | Complaints and requests           | Tickets, document requests, messaging                                       |
 | `web-editor`       | Website                           | Pages, projects, blog, careers, media, SEO                                  |
 
-`super-admin` — hidden Datatech login on that server, seeded from `.env`.
+`super-admin` — hidden Datatech login on that server, seeded by `CompanySeeder` with a starter password that is changed at handover.
 **Customers** log in to the portal with mobile OTP and see only their own data. **Brokers** log in to a limited broker portal; they never see other brokers' leads.
 Unit prices, discounts, project costs, payroll and commission rates are visible only with their permissions (`units.view-price`, `bookings.view-discount`, `projects.view-cost`, `payroll.view`, `commission.view`).
 
@@ -75,7 +75,7 @@ Unit prices, discounts, project costs, payroll and commission rates are visible 
 
 ### A. Company Profile & Setup
 
-Company profile and logo, branches (with the head office marked), document number formats, payment plan templates, chart of accounts template; setup wizard with onboarding checklist; import wizard (dry run, row-level errors, safe re-run) for leads, customers, units with prices, bookings with payment schedules, and received payments from Excel; website theme, branding, menus and pages, publishing on the company's own domain; Datatech hands over a fresh installation (app and database, `owner` and hidden `super-admin` seeded from `.env`).
+Company profile and logo, branches (with the head office marked), document number formats, payment plan templates, chart of accounts template; setup wizard with onboarding checklist; import wizard (dry run, row-level errors, safe re-run) for leads, customers, units with prices, bookings with payment schedules, and received payments from Excel; website theme, branding, menus and pages, publishing on the company's own domain; Datatech hands over a fresh installation (app and database, `owner` and hidden `super-admin` seeded with starter credentials that are changed at handover).
 
 ### B. Public Website
 

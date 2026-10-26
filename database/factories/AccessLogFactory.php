@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\AccessLog;
-use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +20,6 @@ class AccessLogFactory extends Factory
     public function definition(): array
     {
         return [
-            'tenant_id' => Tenant::factory(),
             'user_id' => null,
             'action' => 'document.view',
             'subject_type' => null,

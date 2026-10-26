@@ -12,7 +12,6 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tenant_id')->nullable()->index();
             $table->unsignedBigInteger('branch_id')->nullable()->index();
             $table->string('name');
             $table->string('username');
@@ -26,9 +25,9 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
 
-            $table->unique(['tenant_id', 'email']);
-            $table->unique(['tenant_id', 'username']);
-            $table->unique(['tenant_id', 'mobile']);
+            $table->unique('username');
+            $table->unique('email');
+            $table->unique('mobile');
             $table->index(['email', 'username', 'mobile']);
         });
 

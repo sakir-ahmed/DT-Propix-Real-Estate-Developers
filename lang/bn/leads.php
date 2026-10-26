@@ -1,0 +1,40 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'created' => 'লিড যোগ হয়েছে।',
+    'merged' => 'এই নম্বরে লিড আগেই আছে; নতুন অনুরোধটি অ্যাক্টিভিটি হিসেবে যোগ হয়েছে।',
+    'stage_updated' => 'ধাপ পরিবর্তন হয়েছে।',
+    'lost_reason_required' => 'লিড হারালে কারণ দিতে হবে।',
+    'activity_logged' => 'অ্যাক্টিভিটি সংরক্ষিত হয়েছে।',
+    'visit_scheduled' => 'সাইট ভিজিট নির্ধারিত হয়েছে।',
+    'visit_completed' => 'সাইট ভিজিট সম্পন্ন হয়েছে।',
+    'title' => 'লিড',
+    'add' => 'লিড যোগ করুন',
+    'name' => 'নাম',
+    'mobile' => 'মোবাইল',
+    'source' => 'উৎস',
+    'stage' => 'ধাপ',
+    'project' => 'প্রজেক্ট',
+    'assignee' => 'দায়িত্বে',
+    'next_follow_up' => 'পরবর্তী ফলো-আপ',
+    'timeline' => 'টাইমলাইন',
+    'log_activity' => 'অ্যাক্টিভিটি লিখুন',
+    'schedule_visit' => 'ভিজিট নির্ধারণ করুন',
+    'complete_visit' => 'ভিজিট সম্পন্ন করুন',
+    'move_stage' => 'ধাপ বদলান',
+    'lost_reason' => 'হারানোর কারণ',
+    'follow_up_at' => 'ফলো-আপের তারিখ',
+    'note' => 'নোট',
+    'outcome' => 'ফলাফল',
+    'stages' => [
+        'new' => 'নতুন',
+        'contacted' => 'যোগাযোগ হয়েছে',
+        'visit_planned' => 'ভিজিট পরিকল্পিত',
+        'visited' => 'ভিজিট হয়েছে',
+        'negotiation' => 'আলোচনায়',
+        'booked' => 'বুক হয়েছে',
+        'lost' => 'হারানো',
+    ],
+];

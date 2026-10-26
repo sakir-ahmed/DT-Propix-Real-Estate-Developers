@@ -1,0 +1,40 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'created' => 'Lead captured.',
+    'merged' => 'Existing lead found; the enquiry was added as an activity.',
+    'stage_updated' => 'Stage updated.',
+    'lost_reason_required' => 'A reason is required when a lead is lost.',
+    'activity_logged' => 'Activity logged.',
+    'visit_scheduled' => 'Site visit scheduled.',
+    'visit_completed' => 'Site visit completed.',
+    'title' => 'Leads',
+    'add' => 'Add lead',
+    'name' => 'Name',
+    'mobile' => 'Mobile',
+    'source' => 'Source',
+    'stage' => 'Stage',
+    'project' => 'Project',
+    'assignee' => 'Assignee',
+    'next_follow_up' => 'Next follow-up',
+    'timeline' => 'Timeline',
+    'log_activity' => 'Log activity',
+    'schedule_visit' => 'Schedule visit',
+    'complete_visit' => 'Complete visit',
+    'move_stage' => 'Move stage',
+    'lost_reason' => 'Lost reason',
+    'follow_up_at' => 'Follow-up date',
+    'note' => 'Note',
+    'outcome' => 'Outcome',
+    'stages' => [
+        'new' => 'New',
+        'contacted' => 'Contacted',
+        'visit_planned' => 'Site visit planned',
+        'visited' => 'Visited',
+        'negotiation' => 'Negotiation',
+        'booked' => 'Booked',
+        'lost' => 'Lost',
+    ],
+];

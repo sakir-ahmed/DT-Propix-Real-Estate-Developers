@@ -34,13 +34,13 @@ it('lists users without secrets and signs in as the chosen user', function () {
     config(['propix.demo.enabled' => true]);
     $this->seed();
 
-    $admin = User::query()->withoutGlobalScope('tenant')->where('is_super_admin', true)->firstOrFail();
-    $owner = User::query()->withoutGlobalScope('tenant')->where('username', 'heights.owner')->firstOrFail();
+    $admin = User::query()->where('is_super_admin', true)->firstOrFail();
+    $owner = User::query()->where('username', 'owner')->firstOrFail();
 
     $this->get('/admin/login')
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->has('demoUsers', 3)
+            ->has('demoUsers', 2)
             ->where('demoUsers', function (mixed $users) use ($admin, $owner): bool {
                 $rows = collect($users);
 
@@ -50,16 +50,16 @@ it('lists users without secrets and signs in as the chosen user', function () {
             }));
 
     $this->post('/admin/login/demo', ['user_id' => $admin->id])
-        ->assertRedirect(route('platform.tenants.index'));
+        ->assertRedirect(route('admin.dashboard'));
 
     $this->assertAuthenticatedAs($admin);
 });
 
-it('signs in a tenant owner on the platform host and opens their dashboard', function () {
+it('signs in the owner and opens their dashboard', function () {
     config(['propix.demo.enabled' => true]);
     $this->seed();
 
-    $owner = User::query()->withoutGlobalScope('tenant')->where('username', 'heights.owner')->firstOrFail();
+    $owner = User::query()->where('username', 'owner')->firstOrFail();
 
     $this->post('/admin/login/demo', ['user_id' => $owner->id])
         ->assertRedirect(route('admin.dashboard'));
@@ -70,17 +70,5 @@ it('signs in a tenant owner on the platform host and opens their dashboard', fun
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Admin/Dashboard')
-            ->where('auth.user.username', 'heights.owner'));
-});
-
-it('does not sign in a user from another tenant host', function () {
-    config(['propix.demo.enabled' => true]);
-    $this->seed();
-
-    $owner = User::query()->withoutGlobalScope('tenant')->where('username', 'heights.owner')->firstOrFail();
-
-    $this->post(tenantUrl('gulshan-estates', '/admin/login/demo'), ['user_id' => $owner->id])
-        ->assertNotFound();
-
-    $this->assertGuest();
+            ->where('auth.user.username', 'owner'));
 });

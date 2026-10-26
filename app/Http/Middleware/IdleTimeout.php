@@ -18,7 +18,7 @@ class IdleTimeout
         }
 
         $lastActivity = $request->session()->get('last_activity_at');
-        $timeout = (int) config('propix.idle_timeout_minutes') * 60;
+        $timeout = (int) setting('security.idle_timeout_minutes', 30) * 60;
 
         if (is_int($lastActivity) && (now()->getTimestamp() - $lastActivity) > $timeout) {
             Auth::guard('web')->logout();

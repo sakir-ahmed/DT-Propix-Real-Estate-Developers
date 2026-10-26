@@ -3,10 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'domain' => env('PROPIX_DOMAIN', 'propix.test'),
-
-    'idle_timeout_minutes' => (int) env('PROPIX_IDLE_TIMEOUT_MINUTES', 30),
-
     'otp' => [
         'ttl_seconds' => 300,
         'max_send_per_hour' => 5,
@@ -18,61 +14,7 @@ return [
     ],
 
     'demo' => [
-        'owner_password' => env('DEMO_OWNER_PASSWORD'),
         'enabled' => filter_var(env('IS_DEMO', false), FILTER_VALIDATE_BOOLEAN),
-    ],
-
-    'platform' => [
-        'name' => env('PLATFORM_ADMIN_NAME', 'Datatech Super Admin'),
-        'username' => env('PLATFORM_ADMIN_USERNAME', 'superadmin'),
-        'email' => env('PLATFORM_ADMIN_EMAIL', 'platform@datatech.test'),
-        'mobile' => env('PLATFORM_ADMIN_MOBILE', '8801700000000'),
-        'password' => env('PLATFORM_ADMIN_PASSWORD'),
-    ],
-
-    'plans' => [
-        'starter' => [
-            'name' => 'Starter',
-            'monthly_price' => '5000.00',
-            'limits' => [
-                'projects' => 3,
-                'units' => 300,
-                'users' => 5,
-                'storage_mb' => 1024,
-            ],
-            'modules' => [
-                'website', 'crm', 'units', 'booking', 'collections', 'reports',
-            ],
-        ],
-        'growth' => [
-            'name' => 'Growth',
-            'monthly_price' => '15000.00',
-            'limits' => [
-                'projects' => 10,
-                'units' => 2000,
-                'users' => 20,
-                'storage_mb' => 10240,
-            ],
-            'modules' => [
-                'website', 'crm', 'units', 'booking', 'collections', 'reports',
-                'brokers', 'accounts', 'documents', 'messaging', 'portal',
-            ],
-        ],
-        'pro' => [
-            'name' => 'Pro',
-            'monthly_price' => '40000.00',
-            'limits' => [
-                'projects' => null,
-                'units' => null,
-                'users' => 60,
-                'storage_mb' => 51200,
-            ],
-            'modules' => [
-                'website', 'crm', 'units', 'booking', 'collections', 'reports',
-                'brokers', 'accounts', 'documents', 'messaging', 'portal',
-                'hr', 'costing', 'progress', 'whatsapp', 'custom_domain', 'api',
-            ],
-        ],
     ],
 
     'roles' => [
@@ -179,36 +121,36 @@ return [
             'key' => 'leads',
             'label' => 'nav.leads',
             'icon' => 'user-plus',
-            'route' => 'admin.dashboard',
+            'route' => 'admin.leads.index',
             'permissions' => ['leads.view', 'leads.view-own'],
         ],
         [
-            'key' => 'units',
-            'label' => 'nav.units',
-            'icon' => 'door-open',
-            'route' => 'admin.dashboard',
-            'permissions' => ['units.view'],
+            'key' => 'projects',
+            'label' => 'nav.projects',
+            'icon' => 'building',
+            'route' => 'admin.projects.index',
+            'permissions' => ['projects.view', 'units.view'],
+        ],
+        [
+            'key' => 'customers',
+            'label' => 'nav.customers',
+            'icon' => 'users',
+            'route' => 'admin.customers.index',
+            'permissions' => ['customers.view'],
         ],
         [
             'key' => 'bookings',
             'label' => 'nav.bookings',
             'icon' => 'file-signature',
-            'route' => 'admin.dashboard',
+            'route' => 'admin.bookings.index',
             'permissions' => ['bookings.view', 'bookings.view-own'],
         ],
         [
             'key' => 'collections',
             'label' => 'nav.collections',
             'icon' => 'cash-register',
-            'route' => 'admin.dashboard',
+            'route' => 'admin.collections.index',
             'permissions' => ['collections.view'],
-        ],
-        [
-            'key' => 'website',
-            'label' => 'nav.website',
-            'icon' => 'building',
-            'route' => 'admin.dashboard',
-            'permissions' => ['website.edit'],
         ],
         [
             'key' => 'settings',

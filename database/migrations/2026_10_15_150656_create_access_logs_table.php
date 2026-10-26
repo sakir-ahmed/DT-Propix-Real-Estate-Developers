@@ -12,7 +12,6 @@ return new class extends Migration
     {
         Schema::create('access_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->string('action');
             $table->nullableMorphs('subject');
@@ -20,7 +19,7 @@ return new class extends Migration
             $table->text('user_agent')->nullable();
             $table->timestamps();
 
-            $table->index(['tenant_id', 'action', 'created_at']);
+            $table->index(['action', 'created_at']);
         });
     }
 

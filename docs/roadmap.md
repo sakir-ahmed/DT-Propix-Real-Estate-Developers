@@ -15,7 +15,7 @@ Mark finished phases with `[x]`.
 - [ ] Inertia + Vue 3 + Tailwind v4 tokens (`design.md`), Sonner, dark mode, SSR on public pages only
 - [ ] Localization middleware, `en` / `bn` files, language switcher
 - [ ] Staff auth (username / email / mobile), OTP service, rate limits, idle timeout
-- [ ] Spatie Permission without teams; roles seeded for the company; hidden Datatech `super-admin` from `.env`
+- [ ] Spatie Permission without teams; roles seeded for the company; hidden Datatech `super-admin` seeded by `CompanySeeder`
 - [ ] Activity log, access log for exports and document views, encrypted backups, installation export command
 - [ ] **Shared UI kit** from `design.md` section 22 with `AppIcon` and `NoEmojiTest` in CI
 - [ ] OpenAPI docs generator at `/api-docs`

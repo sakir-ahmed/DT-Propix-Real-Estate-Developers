@@ -155,7 +155,7 @@ const rows = [
             <EmptyState :title="t('ui.empty')" />
             <ErrorState />
             <SkeletonRows :rows="2" />
-            <CommandPalette v-model:open="commandOpen" :commands="['Create tenant', 'Open units']" />
+            <CommandPalette v-model:open="commandOpen" :commands="['New lead', 'Open units']" />
             <ErrorPage :code="403" />
         </div>
     </AdminLayout>

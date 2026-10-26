@@ -62,14 +62,16 @@ const empty = computed(() => !props.loading && !props.error && props.rows.length
                         class="px-3 align-middle"
                         :class="align[column.type] ?? 'text-left'"
                     >
-                        <MoneyText v-if="column.type === 'money'" :amount="row[column.key]" />
-                        <DateText v-else-if="column.type === 'date'" :value="row[column.key]" />
-                        <span v-else-if="column.type === 'actions'" class="inline-flex">
-                            <button type="button" class="inline-flex size-7 items-center justify-center" :aria-label="t('ui.search')">
-                                <AppIcon name="ellipsis" />
-                            </button>
-                        </span>
-                        <span v-else class="whitespace-nowrap">{{ row[column.key] }}</span>
+                        <slot :name="`cell-${column.key}`" :row="row" :index="index">
+                            <MoneyText v-if="column.type === 'money'" :amount="row[column.key]" />
+                            <DateText v-else-if="column.type === 'date'" :value="row[column.key]" />
+                            <span v-else-if="column.type === 'actions'" class="inline-flex">
+                                <button type="button" class="inline-flex size-7 items-center justify-center" :aria-label="t('ui.search')">
+                                    <AppIcon name="ellipsis" />
+                                </button>
+                            </span>
+                            <span v-else class="whitespace-nowrap">{{ row[column.key] }}</span>
+                        </slot>
                     </td>
                 </tr>
             </tbody>

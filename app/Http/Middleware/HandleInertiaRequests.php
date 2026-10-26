@@ -6,7 +6,6 @@ namespace App\Http\Middleware;
 
 use App\Models\User;
 use App\Support\MenuBuilder;
-use App\Support\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
 use Inertia\Middleware;
@@ -41,20 +40,6 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             'menu' => fn (): array => app(MenuBuilder::class)->for($user instanceof User ? $user : null),
-            'tenant' => function () {
-                $tenant = app(TenantContext::class)->tenant();
-
-                if ($tenant === null) {
-                    return null;
-                }
-
-                return [
-                    'id' => $tenant->id,
-                    'name' => $tenant->name,
-                    'slug' => $tenant->slug,
-                    'status' => $tenant->status->value,
-                ];
-            },
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
@@ -68,7 +53,7 @@ class HandleInertiaRequests extends Middleware
     private function translations(): array
     {
         $locale = app()->getLocale();
-        $groups = ['nav', 'auth', 'ui', 'platform', 'plans', 'tenants'];
+        $groups = ['nav', 'auth', 'ui', 'projects', 'units', 'leads', 'customers', 'bookings', 'collections'];
         $lines = [];
 
         foreach ($groups as $group) {

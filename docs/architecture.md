@@ -88,9 +88,9 @@ app/
 
 ## 4. Roles & Permissions
 
-Spatie Permission without teams. This installation serves one company; roles are defined in `prd.md` and seeded when the installation is created. `super-admin` is a hidden Datatech login on that server, seeded from `.env`.
+Spatie Permission without teams. This installation serves one company; roles are defined in `prd.md` and seeded when the installation is created. `super-admin` is a hidden Datatech login on that server, seeded by `CompanySeeder`.
 
-Use permissions (`units.change-price`, `bookings.discount`, `bookings.cancel`, `refunds.approve`, `journals.post`, `payroll.approve`), not role names, in policies and `@can` checks. The `super-admin` credentials come from `.env` values (never hard-code a password).
+Use permissions (`units.change-price`, `bookings.discount`, `bookings.cancel`, `refunds.approve`, `journals.post`, `payroll.approve`), not role names, in policies and `@can` checks. The `super-admin` and `owner` starter credentials are fixed in `CompanySeeder`; both passwords are changed right after the first sign-in, and the seeder never overwrites an existing account.
 
 ---
 
@@ -254,7 +254,8 @@ A feature is **done** only when all of these are true:
 - **Branches:** the company may add branches in that same database. `BelongsToBranch` scopes non-owner users to their assigned branches. Owners and the super-admin see every branch. An architecture test fails if a model with a `branch_id` column lacks the trait. Unique keys are per this database (for example `unique(customer_code)`).
 - **Queues and scheduler:** jobs run for this installation only. There is no loop over tenants.
 - **Storage:** private disk paths stay inside this server (`customers/{id}/...`). Never use public storage for customer documents.
-- **Accounts:** the seeder creates the first `owner` and the hidden Datatech `super-admin` from `.env`. There is no `/platform` console, no impersonation, no plan gate, and no subscription state.
+- **Accounts:** the seeder creates the first `owner` and the hidden Datatech `super-admin` with fixed starter credentials that are changed after the first sign-in. There is no `/platform` console, no impersonation, no plan gate, and no subscription state.
+- **Settings:** installation-wide values the owner may change (company profile, idle timeout, hold hours, discount limit, revenue recognition basis, late charges) live in the `settings` key-value table, seeded with defaults by `SettingSeeder` and read through `setting()`. Secrets and infrastructure stay in `.env`.
 - **Tests:** every branch-owned model and endpoint has a cross-branch test (a manager of branch A gets 404 for branch B, including the public website and portal).
 - **Export:** a command exports this installation's data (CSV or JSON plus files).
 

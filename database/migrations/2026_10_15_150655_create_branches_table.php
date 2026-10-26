@@ -12,14 +12,13 @@ return new class extends Migration
     {
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('code');
             $table->string('address')->nullable();
             $table->boolean('is_head_office')->default(false);
             $table->timestamps();
 
-            $table->unique(['tenant_id', 'code']);
+            $table->unique('code');
         });
 
         Schema::table('users', function (Blueprint $table) {

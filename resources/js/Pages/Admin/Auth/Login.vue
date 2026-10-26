@@ -60,7 +60,6 @@ function loginAs(userId) {
                             <th class="px-3">{{ t('auth.demo_name') }}</th>
                             <th class="px-3">{{ t('auth.demo_username') }}</th>
                             <th class="px-3">{{ t('auth.demo_email') }}</th>
-                            <th class="px-3">{{ t('auth.demo_company') }}</th>
                             <th class="px-3 text-right">{{ t('auth.demo_login') }}</th>
                         </tr>
                     </thead>
@@ -69,7 +68,6 @@ function loginAs(userId) {
                             <td class="px-3">{{ user.name }}</td>
                             <td class="px-3">{{ user.username }}</td>
                             <td class="px-3">{{ user.email }}</td>
-                            <td class="px-3">{{ user.company ?? t('auth.demo_platform') }}</td>
                             <td class="px-3 text-right">
                                 <button
                                     type="button"

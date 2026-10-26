@@ -6,8 +6,3 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class)->in('Feature');
-
-function tenantUrl(string $slug, string $path = '/'): string
-{
-    return 'http://'.$slug.'.'.config('propix.domain').$path;
-}

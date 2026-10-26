@@ -19,8 +19,6 @@ return [
     'demo_name' => 'Name',
     'demo_username' => 'Username',
     'demo_email' => 'Email',
-    'demo_company' => 'Company',
-    'demo_platform' => 'Platform',
     'demo_login' => 'Login',
     'otp_message' => 'Your verification code is :code',
     'otp_sent' => 'Verification code sent.',
